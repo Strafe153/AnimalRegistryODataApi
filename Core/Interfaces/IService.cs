@@ -1,10 +1,10 @@
 ﻿namespace Core.Interfaces;
 
-public interface IService<T, TId>
+public interface IService<T>
 {
-    Task<IEnumerable<T>> GetAllAsync();
-    Task<T> GetByIdAsync(TId id);
-    Task CreateAsync(T entity);
-    Task UpdateAsync(T entity);
-    Task TaskDeleteAsync(T entity);
+    IQueryable<T> GetAllAsync();
+    IQueryable<T> GetByIdAsync(Guid id);
+    Task<T> CreateAsync(T dto);
+    Task UpdateAsync(Guid id, T dto);
+    Task DeleteAsync(Guid id);
 }

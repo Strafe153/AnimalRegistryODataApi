@@ -1,6 +1,6 @@
-﻿namespace Core.Entities;
+﻿namespace Core.DTOs;
 
-public class Owner
+public class OwnerDto
 {
     public Guid Id { get; set; }
     public string? FirstName { get; set; }
@@ -9,5 +9,5 @@ public class Owner
     public string? Email { get; set; }
     public string? PhoneNumber { get; set; }
 
-    public IList<Animal>? Animals { get; set; }
+    public IList<AnimalDto>? Animals { get; set; }
 }

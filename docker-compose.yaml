@@ -1,0 +1,38 @@
+version: '3.8'
+services:
+  animal_registry_odata_api:
+    build:
+      context: .
+      dockerfile: ./AnimalRegistryODataApi/Dockerfile
+    container_name: animal_registry_odata_api
+    ports:
+      - 8080:80
+      - 8081:443
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=https://+:443;http://+:80
+      - ASPNETCORE_HTTPS_PORT=8081
+      - ASPNETCORE_Kestrel__Certificates__Default__Password=crypticpassword
+      - ASPNETCORE_Kestrel__Certificates__Default__Path=/https/AnimalRegistryODataApi.pfx
+      - "ConnectionStrings:DefaultConnection=Server=localhost;Database=animal_registry_db;User ID=user;Password=password;"
+    volumes:
+      - ~/.aspnet/https:/https:ro
+    depends_on:
+      - mysql
+
+  mysql:
+    image: mysql
+    container_name: mysql
+    restart: always
+    environment:
+      MYSQL_USER: 'user'
+      MYSQL_PASSWORD: 'password'
+      MYSQL_ROOT_PASSWORD: 'password'
+      MYSQL_DATABASE: animal_registry_db
+    ports:
+      - 3306:3306
+    volumes:
+      - animal_registry_db:/var/lib/mysql
+
+volumes:
+  animal_registry_db:
