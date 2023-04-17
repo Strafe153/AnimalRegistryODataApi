@@ -12,29 +12,29 @@ public class OwnersController : ODataController
 {
     private readonly IService<OwnerDto> _ownersService;
 
-	public OwnersController(IService<OwnerDto> ownersService)
-	{
-		_ownersService = ownersService;
-	}
+    public OwnersController(IService<OwnerDto> ownersService)
+    {
+        _ownersService = ownersService;
+    }
 
-	[EnableQuery(PageSize = 10)]
-	public ActionResult<IQueryable<OwnerDto>> Get() =>
-		Ok(_ownersService.GetAllAsync());
+    [EnableQuery(PageSize = 10)]
+    public ActionResult<IQueryable<OwnerDto>> Get() =>
+        Ok(_ownersService.GetAllAsync());
 
-	[EnableQuery]
+    [EnableQuery]
     public ActionResult<SingleResult<OwnerDto>> Get([FromODataUri] Guid key) =>
-		Ok(SingleResult.Create(_ownersService.GetByIdAsync(key)));
+        Ok(SingleResult.Create(_ownersService.GetByIdAsync(key)));
 
-	public async Task<ActionResult<OwnerDto>> Post([FromBody] OwnerDto createDto)
-	{
-		var readDto = await _ownersService.CreateAsync(createDto);
-		return CreatedAtAction(nameof(Get), new { Key = readDto.Id }, readDto);
-	}
+    public async Task<ActionResult<OwnerDto>> Post([FromBody] OwnerDto createDto)
+    {
+        var readDto = await _ownersService.CreateAsync(createDto);
+        return CreatedAtAction(nameof(Get), new { Key = readDto.Id }, readDto);
+    }
 
-	public async Task<ActionResult> Put([FromODataUri] Guid key, [FromBody] OwnerDto updateDto)
-	{
-		await _ownersService.UpdateAsync(key, updateDto);
-		return NoContent();
+    public async Task<ActionResult> Put([FromODataUri] Guid key, [FromBody] OwnerDto updateDto)
+    {
+        await _ownersService.UpdateAsync(key, updateDto);
+        return NoContent();
     }
 
     public async Task<ActionResult> Delete([FromODataUri] Guid key)
