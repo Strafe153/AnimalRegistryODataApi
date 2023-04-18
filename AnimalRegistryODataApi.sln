@@ -3,13 +3,15 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.4.33103.184
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AnimalRegistryODataApi", "AnimalRegistryODataApi\AnimalRegistryODataApi.csproj", "{19AEA710-DA07-4DAD-B27D-1C7BC89E824F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AnimalRegistryODataApi", "AnimalRegistryODataApi\AnimalRegistryODataApi.csproj", "{19AEA710-DA07-4DAD-B27D-1C7BC89E824F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Application", "Application\Application.csproj", "{9FA5B761-A5C1-413B-A4BB-DE02C0EED4D2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Application", "Application\Application.csproj", "{9FA5B761-A5C1-413B-A4BB-DE02C0EED4D2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataAccess", "DataAccess\DataAccess.csproj", "{D00CE591-F5C2-4073-91E8-0B8CBC489EB1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DataAccess", "DataAccess\DataAccess.csproj", "{D00CE591-F5C2-4073-91E8-0B8CBC489EB1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core", "Core\Core.csproj", "{7C99A282-7C21-41EA-9F34-38C176CBF9F4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Core", "Core\Core.csproj", "{7C99A282-7C21-41EA-9F34-38C176CBF9F4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Application.Tests", "Tests\Application.Tests\Application.Tests.csproj", "{0B301442-9F39-4D58-8B5C-F8FBAF826B01}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +35,10 @@ Global
 		{7C99A282-7C21-41EA-9F34-38C176CBF9F4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7C99A282-7C21-41EA-9F34-38C176CBF9F4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7C99A282-7C21-41EA-9F34-38C176CBF9F4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0B301442-9F39-4D58-8B5C-F8FBAF826B01}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0B301442-9F39-4D58-8B5C-F8FBAF826B01}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0B301442-9F39-4D58-8B5C-F8FBAF826B01}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0B301442-9F39-4D58-8B5C-F8FBAF826B01}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
