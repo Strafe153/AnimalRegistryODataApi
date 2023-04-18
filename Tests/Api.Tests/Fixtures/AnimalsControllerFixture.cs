@@ -5,7 +5,7 @@ using Core.DTOs;
 using Core.Interfaces;
 using Moq;
 
-namespace Application.Tests.Fixtures;
+namespace Api.Tests.Fixtures;
 
 public class AnimalsControllerFixture
 {

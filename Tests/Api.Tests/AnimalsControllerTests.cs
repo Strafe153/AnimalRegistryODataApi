@@ -1,4 +1,4 @@
-﻿using Application.Tests.Fixtures;
+﻿using Api.Tests.Fixtures;
 using Core.DTOs;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.OData.Results;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 
-namespace Application.Tests;
+namespace Api.Tests;
 
 [TestClass]
 public class AnimalsControllerTests
