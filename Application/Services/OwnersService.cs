@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using AutoMapper.QueryableExtensions;
 using Core.DTOs;
 using Core.Entities;
 using Core.Exceptions;

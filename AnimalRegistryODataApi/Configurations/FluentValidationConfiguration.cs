@@ -11,7 +11,8 @@ public static class FluentValidationConfiguration
     {
         services.AddCustomValidators();
 
-        services.AddFluentValidationAutoValidation()
+        services
+            .AddFluentValidationAutoValidation()
             .AddFluentValidationClientsideAdapters();
     }
 

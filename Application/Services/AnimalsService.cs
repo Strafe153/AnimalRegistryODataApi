@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using AutoMapper.QueryableExtensions;
 using Core.DTOs;
 using Core.Entities;
 using Core.Exceptions;
@@ -74,7 +73,6 @@ public class AnimalsService : IService<AnimalDto>
 
     public async Task UpdateAsync(Guid id, AnimalDto dto)
     {
-        //var animal = await _context.Animals.FirstOrDefaultAsync(a => a.Id == id);
         var animal = await _context.Animals.FindAsync(id);
 
         if (animal is null)
