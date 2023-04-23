@@ -23,7 +23,7 @@ public class OwnersControllerTests
     {
         // Arrange
         _fixture.OwnersService
-            .Setup(s => s.GetAllAsync())
+            .Setup(s => s.GetAll())
             .Returns(_fixture.OwnerDtoQuery);
 
         // Act
@@ -42,7 +42,7 @@ public class OwnersControllerTests
     {
         // Arrange
         _fixture.OwnersService
-            .Setup(s => s.GetByIdAsync(It.IsAny<Guid>()))
+            .Setup(s => s.GetById(It.IsAny<Guid>()))
             .Returns(_fixture.OwnerDtoQuery);
 
         // Act

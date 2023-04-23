@@ -15,7 +15,7 @@ public class OwnersService : IService<OwnerDto>
     private readonly IMapper _mapper;
 
     public OwnersService(
-        AnimalRegistryContext context, 
+        AnimalRegistryContext context,
         IMapper mapper)
     {
         _context = context;
@@ -42,20 +42,19 @@ public class OwnersService : IService<OwnerDto>
         return readDto;
     }
 
-    public IQueryable<OwnerDto> GetAllAsync() =>
-        _context.Owners
-            .Include(o => o.Animals)
-            .ProjectTo<OwnerDto>(_mapper.ConfigurationProvider);
+    public IQueryable<OwnerDto> GetAll() =>
+        _mapper.ProjectTo<OwnerDto>(
+            _context.Owners.Include(o => o.Animals));
 
-    public IQueryable<OwnerDto> GetByIdAsync(Guid id) =>
-        _context.Owners
-            .Include(o => o.Animals)
-            .Where(o => o.Id == id)
-            .ProjectTo<OwnerDto>(_mapper.ConfigurationProvider);
+    public IQueryable<OwnerDto> GetById(Guid id) =>
+        _mapper.ProjectTo<OwnerDto>(
+            _context.Owners
+                .Include(o => o.Animals)
+                .Where(o => o.Id == id));
 
     public async Task DeleteAsync(Guid id)
     {
-        var owner = await _context.Owners.FirstOrDefaultAsync(o => o.Id == id);
+        var owner = await _context.Owners.FindAsync(id);
 
         if (owner is null)
         {
@@ -75,7 +74,7 @@ public class OwnersService : IService<OwnerDto>
 
     public async Task UpdateAsync(Guid id, OwnerDto dto)
     {
-        var owner = await _context.Owners.FirstOrDefaultAsync(o => o.Id == id);
+        var owner = await _context.Owners.FindAsync(id);
 
         if (owner is null)
         {

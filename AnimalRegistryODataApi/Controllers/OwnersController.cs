@@ -19,11 +19,11 @@ public class OwnersController : ODataController
 
     [EnableQuery(PageSize = 10)]
     public ActionResult<IQueryable<OwnerDto>> Get() =>
-        Ok(_ownersService.GetAllAsync());
+        Ok(_ownersService.GetAll());
 
     [EnableQuery]
     public ActionResult<SingleResult<OwnerDto>> Get([FromODataUri] Guid key) =>
-        Ok(SingleResult.Create(_ownersService.GetByIdAsync(key)));
+        Ok(SingleResult.Create(_ownersService.GetById(key)));
 
     public async Task<ActionResult<OwnerDto>> Post([FromBody] OwnerDto createDto)
     {

@@ -23,7 +23,7 @@ public class AnimalsControllerTests
     {
         // Arrange
         _fixture.AnimalsService
-            .Setup(s => s.GetAllAsync())
+            .Setup(s => s.GetAll())
             .Returns(_fixture.AnimalDtoQuery);
 
         // Act
@@ -42,7 +42,7 @@ public class AnimalsControllerTests
     {
         // Arrange
         _fixture.AnimalsService
-            .Setup(s => s.GetByIdAsync(It.IsAny<Guid>()))
+            .Setup(s => s.GetById(It.IsAny<Guid>()))
             .Returns(_fixture.AnimalDtoQuery);
 
         // Act

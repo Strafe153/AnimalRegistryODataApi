@@ -21,11 +21,11 @@ public class AnimalsController : ODataController
 
     [EnableQuery(PageSize = 10)]
     public ActionResult<IQueryable<AnimalDto>> Get() =>
-        Ok(_animalsService.GetAllAsync());
+        Ok(_animalsService.GetAll());
 
     [EnableQuery]
     public ActionResult<SingleResult<AnimalDto>> Get([FromODataUri] Guid key) =>
-        Ok(SingleResult.Create(_animalsService.GetByIdAsync(key)));
+        Ok(SingleResult.Create(_animalsService.GetById(key)));
 
     public async Task<ActionResult<AnimalDto>> Post([FromBody] AnimalDto createDto)
     {
