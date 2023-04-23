@@ -16,7 +16,3 @@
 * `Moq` for mocking
 * `AutoFixture` for test fixtures
 * `FluentAssertions` for assertions
-
-## How To Use?
-1. Create an owner
-2. Add animals
