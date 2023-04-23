@@ -10,6 +10,6 @@ public static class CustomServicesConfiguration
     public static void ConfigureCustomServices(this IServiceCollection services)
     {
         services.AddScoped<IService<OwnerDto>, OwnersService>();
-        services.AddScoped<IService<AnimalDto>, AnimalService>();
+        services.AddScoped<IService<AnimalDto>, AnimalsService>();
     }
 }

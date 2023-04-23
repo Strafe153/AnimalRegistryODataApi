@@ -9,12 +9,12 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Application.Services;
 
-public class AnimalService : IService<AnimalDto>
+public class AnimalsService : IService<AnimalDto>
 {
     private readonly AnimalRegistryContext _context;
     private readonly IMapper _mapper;
 
-    public AnimalService(
+    public AnimalsService(
         AnimalRegistryContext context,
         IMapper mapper)
     {
@@ -42,20 +42,19 @@ public class AnimalService : IService<AnimalDto>
         return readDto;
     }
 
-    public IQueryable<AnimalDto> GetAllAsync() =>
-        _context.Animals
-            .Include(a => a.Owner)
-            .ProjectTo<AnimalDto>(_mapper.ConfigurationProvider);
+    public IQueryable<AnimalDto> GetAll() =>
+        _mapper.ProjectTo<AnimalDto>(
+            _context.Animals.Include(a => a.Owner));
 
-    public IQueryable<AnimalDto> GetByIdAsync(Guid id) =>
-        _context.Animals
-            .Include(a => a.Owner)
-            .Where(a => a.Id == id)
-            .ProjectTo<AnimalDto>(_mapper.ConfigurationProvider);
+    public IQueryable<AnimalDto> GetById(Guid id) =>
+        _mapper.ProjectTo<AnimalDto>(
+            _context.Animals
+                .Include(a => a.Owner)
+                .Where(a => a.Id == id));
 
     public async Task DeleteAsync(Guid id)
     {
-        var animal = await _context.Animals.FirstOrDefaultAsync(a => a.Id == id);
+        var animal = await _context.Animals.FindAsync(id);
 
         if (animal is null)
         {
@@ -75,7 +74,8 @@ public class AnimalService : IService<AnimalDto>
 
     public async Task UpdateAsync(Guid id, AnimalDto dto)
     {
-        var animal = await _context.Animals.FirstOrDefaultAsync(a => a.Id == id);
+        //var animal = await _context.Animals.FirstOrDefaultAsync(a => a.Id == id);
+        var animal = await _context.Animals.FindAsync(id);
 
         if (animal is null)
         {
@@ -86,7 +86,7 @@ public class AnimalService : IService<AnimalDto>
 
         try
         {
-            _context.Animals.Update(animal);
+            _context.Update(animal);
             await _context.SaveChangesAsync();
         }
         catch (Exception)
