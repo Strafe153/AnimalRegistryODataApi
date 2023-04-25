@@ -14,5 +14,6 @@
 * `FluentValidation` for DTO validation
 * `MSTest` for unit-tests
 * `Moq` for mocking
+* `MockQueryable.Moq` for mocking IQueryable
 * `AutoFixture` for test fixtures
 * `FluentAssertions` for assertions
