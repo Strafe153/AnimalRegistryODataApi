@@ -17,3 +17,4 @@
 * `MockQueryable.Moq` for mocking IQueryable and DbSet
 * `AutoFixture` for test fixtures
 * `FluentAssertions` for assertions
+* `Bogus` for fake data generation
