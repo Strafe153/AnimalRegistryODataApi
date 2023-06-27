@@ -1,6 +1,5 @@
 ﻿using Application.Services;
 using Core.DTOs;
-using Core.Entities;
 using Core.Interfaces;
 
 namespace AnimalRegistryODataApi.Configurations;

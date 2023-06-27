@@ -1,5 +1,4 @@
 ﻿using Core.DTOs;
-using Core.Entities;
 using Microsoft.AspNetCore.OData;
 using Microsoft.OData.ModelBuilder;
 

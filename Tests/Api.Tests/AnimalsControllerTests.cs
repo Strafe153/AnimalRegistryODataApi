@@ -35,6 +35,7 @@ public class AnimalsControllerTests
         result.Should().BeOfType<ActionResult<IQueryable<AnimalDto>>>();
         objectResult.StatusCode.Should().Be(200);
         queryResult.Should().NotBeNull();
+        queryResult.Count().Should().Be(_fixture.AnimalDtosCount);
     }
 
     [TestMethod]

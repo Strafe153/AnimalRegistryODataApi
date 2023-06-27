@@ -22,7 +22,7 @@ public static class MigrationsConfiguration
     private static bool CanConnect(this AnimalRegistryContext dbContext)
     {
         var connecion = dbContext.Database.GetDbConnection();
-        var masterConnection = new MySqlConnection(connecion.ConnectionString);
+        using var masterConnection = new MySqlConnection(connecion.ConnectionString);
 
         try
         {
@@ -32,10 +32,6 @@ public static class MigrationsConfiguration
         catch (MySqlException)
         {
             return false;
-        }
-        finally
-        {
-            masterConnection?.Dispose();
         }
 
         return true;

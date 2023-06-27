@@ -35,6 +35,7 @@ public class OwnersControllerTests
         result.Should().BeOfType<ActionResult<IQueryable<OwnerDto>>>();
         objectResult.StatusCode.Should().Be(200);
         queryResult.Should().NotBeNull();
+        queryResult.Count().Should().Be(_fixture.OwnerDtosCount);
     }
 
     [TestMethod]

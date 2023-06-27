@@ -7,6 +7,6 @@ public class Animal
     public string? Kind { get; set; }
     public int Age { get; set; }
 
-    public Owner Owner { get; set; }
+    public Owner? Owner { get; set; }
     public Guid OwnerId { get; set; }
 }

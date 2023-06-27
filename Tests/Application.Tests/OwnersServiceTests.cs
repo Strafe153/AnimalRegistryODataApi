@@ -24,17 +24,13 @@ public class OwnersServiceTests
         // Arrange
         _fixture.Context
             .Setup(c => c.Owners)
-            .Returns(_fixture.OwnersDbSet);
-
-        _fixture.Mapper
-            .Setup(m => m.ProjectTo<OwnerDto>(It.IsAny<IQueryable<Owner>>(), It.IsAny<object>()))
-            .Returns(_fixture.OwnerDtosQuery);
+            .Returns(_fixture.GetAllOwnersDbSet);
 
         // Act
         var result = _fixture.OwnersService.GetAll();
 
         // Assert
-        result.AsEnumerable().Should().NotBeEmpty();
+        result.Count().Should().Be(_fixture.OwnersCount);
     }
 
     [TestMethod]
@@ -43,17 +39,13 @@ public class OwnersServiceTests
         // Arrange
         _fixture.Context
             .Setup(c => c.Owners)
-            .Returns(_fixture.OwnersDbSet);
-
-        _fixture.Mapper
-            .Setup(m => m.ProjectTo<OwnerDto>(It.IsAny<IQueryable<Owner>>(), It.IsAny<object>()))
-            .Returns(_fixture.OwnerDtosQuery);
+            .Returns(_fixture.GetByIdOwnersDbSet);
 
         // Act
         var result = _fixture.OwnersService.GetById(_fixture.Id);
 
         // Assert
-        result.Count().Should().Be(2);
+        result.Count().Should().Be(1);
     }
 
     [TestMethod]
@@ -62,7 +54,7 @@ public class OwnersServiceTests
         // Arrange
         _fixture.Context
             .Setup(c => c.Owners)
-            .Returns(_fixture.OwnersDbSet);
+            .Returns(_fixture.GetAllOwnersDbSet);
 
         _fixture.Context
             .Setup(c => c.SaveChangesAsync(It.IsAny<CancellationToken>()))
@@ -107,7 +99,7 @@ public class OwnersServiceTests
         // Arrange
         _fixture.Context
             .Setup(c => c.Owners)
-            .Returns(_fixture.OwnersDbSet);
+            .Returns(_fixture.GetAllOwnersDbSet);
 
         _fixture.Context
             .Setup(c => c.Owners.FindAsync(It.IsAny<object[]>()))
@@ -126,7 +118,7 @@ public class OwnersServiceTests
         // Arrange
         _fixture.Context
             .Setup(c => c.Owners)
-            .Returns(_fixture.OwnersDbSet);
+            .Returns(_fixture.GetAllOwnersDbSet);
 
         _fixture.Context
             .Setup(c => c.Owners.FindAsync(It.IsAny<object[]>()))
@@ -156,7 +148,7 @@ public class OwnersServiceTests
         // Arrange
         _fixture.Context
             .Setup(c => c.Owners)
-            .Returns(_fixture.OwnersDbSet);
+            .Returns(_fixture.GetAllOwnersDbSet);
 
         _fixture.Context
             .Setup(c => c.Owners.FindAsync(It.IsAny<object[]>()))
@@ -175,7 +167,7 @@ public class OwnersServiceTests
         // Arrange
         _fixture.Context
             .Setup(c => c.Owners)
-            .Returns(_fixture.OwnersDbSet);
+            .Returns(_fixture.GetAllOwnersDbSet);
 
         _fixture.Context
             .Setup(c => c.Owners.FindAsync(It.IsAny<object[]>()))

@@ -1,5 +1,4 @@
 ﻿using Application.Tests.Fixtures;
-using Core.DTOs;
 using Core.Entities;
 using Core.Exceptions;
 using FluentAssertions;
@@ -24,17 +23,14 @@ public class AnimalsServiceTests
         // Arrange
         _fixture.Context
             .Setup(c => c.Animals)
-            .Returns(_fixture.AnimalsDbSet);
-
-        _fixture.Mapper
-            .Setup(m => m.ProjectTo<AnimalDto>(It.IsAny<IQueryable<Animal>>(), It.IsAny<object>()))
-            .Returns(_fixture.AnimalDtosQuery);
+            .Returns(_fixture.GetAllAnimalsDbSet);
 
         // Act
+        
         var result = _fixture.AnimalsService.GetAll();
 
         // Assert
-        result.AsEnumerable().Should().NotBeEmpty();
+        result.Count().Should().Be(_fixture.AnimalsCount);
     }
 
     [TestMethod]
@@ -43,17 +39,13 @@ public class AnimalsServiceTests
         // Arrange
         _fixture.Context
             .Setup(c => c.Animals)
-            .Returns(_fixture.AnimalsDbSet);
-
-        _fixture.Mapper
-            .Setup(m => m.ProjectTo<AnimalDto>(It.IsAny<IQueryable<Animal>>(), It.IsAny<object>()))
-            .Returns(_fixture.AnimalDtosQuery);
+            .Returns(_fixture.GetByIdAnimalsDbSet);
 
         // Act
         var result = _fixture.AnimalsService.GetById(_fixture.Id);
 
         // Assert
-        result.Count().Should().Be(2);
+        result.Count().Should().Be(1);
     }
 
     [TestMethod]
@@ -62,7 +54,7 @@ public class AnimalsServiceTests
         // Arrange
         _fixture.Context
             .Setup(c => c.Animals)
-            .Returns(_fixture.AnimalsDbSet);
+            .Returns(_fixture.GetAllAnimalsDbSet);
 
         _fixture.Context
             .Setup(c => c.SaveChangesAsync(It.IsAny<CancellationToken>()))
@@ -107,7 +99,7 @@ public class AnimalsServiceTests
         // Arrange
         _fixture.Context
             .Setup(c => c.Animals)
-            .Returns(_fixture.AnimalsDbSet);
+            .Returns(_fixture.GetAllAnimalsDbSet);
 
         _fixture.Context
             .Setup(c => c.Animals.FindAsync(It.IsAny<object[]>()))
@@ -126,7 +118,7 @@ public class AnimalsServiceTests
         // Arrange
         _fixture.Context
             .Setup(c => c.Animals)
-            .Returns(_fixture.AnimalsDbSet);
+            .Returns(_fixture.GetAllAnimalsDbSet);
 
         _fixture.Context
             .Setup(c => c.Animals.FindAsync(It.IsAny<object[]>()))
@@ -156,7 +148,7 @@ public class AnimalsServiceTests
         // Arrange
         _fixture.Context
             .Setup(c => c.Animals)
-            .Returns(_fixture.AnimalsDbSet);
+            .Returns(_fixture.GetAllAnimalsDbSet);
 
         _fixture.Context
             .Setup(c => c.Animals.FindAsync(It.IsAny<object[]>()))
@@ -175,7 +167,7 @@ public class AnimalsServiceTests
         // Arrange
         _fixture.Context
             .Setup(c => c.Animals)
-            .Returns(_fixture.AnimalsDbSet);
+            .Returns(_fixture.GetAllAnimalsDbSet);
 
         _fixture.Context
             .Setup(c => c.Animals.FindAsync(It.IsAny<object[]>()))

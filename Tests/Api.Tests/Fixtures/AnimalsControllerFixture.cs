@@ -1,6 +1,7 @@
 ﻿using AnimalRegistryODataApi.Controllers;
-using AutoFixture.AutoMoq;
 using AutoFixture;
+using AutoFixture.AutoMoq;
+using Bogus;
 using Core.DTOs;
 using Core.Interfaces;
 using Moq;
@@ -13,54 +14,42 @@ public class AnimalsControllerFixture
     {
         var fixture = new Fixture().Customize(new AutoMoqCustomization());
 
+        var animalDtoFaker = new Faker<AnimalDto>();
+
+        var ownerDtoFaker = new Faker<OwnerDto>()
+            .RuleFor(o => o.Id, Guid.NewGuid())
+            .RuleFor(o => o.FirstName, f => f.Name.FirstName())
+            .RuleFor(o => o.LastName, f => f.Name.LastName())
+            .RuleFor(o => o.Age, f => f.Random.Int(1, 100))
+            .RuleFor(o => o.Email, f => f.Internet.Email())
+            .RuleFor(o => o.PhoneNumber, f => f.Phone.PhoneNumber())
+            .RuleFor(o => o.Animals, animalDtoFaker.Generate(AnimalDtosCount));
+
+        animalDtoFaker
+            .RuleFor(a => a.Id, Id)
+            .RuleFor(a => a.PetName, f => f.Name.FirstName())
+            .RuleFor(a => a.Kind, f => f.Name.LastName())
+            .RuleFor(a => a.Age, f => f.Random.Int(1, 100))
+            .RuleFor(a => a.Owner, ownerDtoFaker)
+            .RuleFor(a => a.OwnerId, (f, u) => u.Owner!.Id);
+
         AnimalsService = fixture.Freeze<Mock<IService<AnimalDto>>>();
 
         AnimalsController = new AnimalsController(AnimalsService.Object);
 
         Id = Guid.NewGuid();
-        AnimalDto = GetAnimalDto();
-        AnimalDtos = GetAnimalDtos();
-        AnimalDtoQuery = GetAnimalDtoQuery();
+        AnimalDtosCount = Random.Shared.Next(2, 20);
+        AnimalDto = animalDtoFaker.Generate();
+        AnimalDtos = animalDtoFaker.Generate(AnimalDtosCount);
+        AnimalDtoQuery = AnimalDtos.AsQueryable();
     }
 
     public AnimalsController AnimalsController { get; }
     public Mock<IService<AnimalDto>> AnimalsService { get; }
 
     public Guid Id { get; }
+    public int AnimalDtosCount { get; }
     public AnimalDto AnimalDto { get; }
     public IList<AnimalDto> AnimalDtos { get; }
     public IQueryable<AnimalDto> AnimalDtoQuery { get; }
-
-    private OwnerDto GetOwnerDto() =>
-        new()
-        {
-            Id = Id,
-            FirstName = "Ren",
-            LastName = "Amamiya",
-            Age = 16,
-            Email = "joker@gmail.com",
-            PhoneNumber = "0662931093",
-            Animals = GetAnimalDtos()
-        };
-
-    private AnimalDto GetAnimalDto() =>
-        new()
-        {
-            Id = Guid.NewGuid(),
-            PetName = "Morgana",
-            Kind = "Not a cat",
-            Age = 1,
-            Owner = GetOwnerDto(),
-            OwnerId = Id
-        };
-
-    private IList<AnimalDto> GetAnimalDtos() =>
-        new List<AnimalDto>
-        {
-            AnimalDto,
-            AnimalDto
-        };
-
-    private IQueryable<AnimalDto> GetAnimalDtoQuery() =>
-        AnimalDtos.AsQueryable();
 }

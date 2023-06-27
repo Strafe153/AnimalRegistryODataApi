@@ -1,7 +1,9 @@
-﻿using Application.Services;
+﻿using Application.AutoMapperProfiles;
+using Application.Services;
 using AutoFixture;
 using AutoFixture.AutoMoq;
 using AutoMapper;
+using Bogus;
 using Core.DTOs;
 using Core.Entities;
 using DataAccess;
@@ -17,91 +19,73 @@ public class AnimalsServiceFixture
     {
         var fixture = new Fixture().Customize(new AutoMoqCustomization());
 
-        Context = fixture.Freeze<Mock<AnimalRegistryContext>>();
-        Mapper = fixture.Freeze<Mock<IMapper>>();
+        var animalFaker = new Faker<Animal>();
+        var animalDtoFaker = new Faker<AnimalDto>();
 
-        AnimalsService = new AnimalsService(Context.Object, Mapper.Object);
+        var ownerFaker = new Faker<Owner>()
+            .RuleFor(o => o.Id, Guid.NewGuid())
+            .RuleFor(o => o.FirstName, f => f.Name.FirstName())
+            .RuleFor(o => o.LastName, f => f.Name.LastName())
+            .RuleFor(o => o.Age, f => f.Random.Int(1, 100))
+            .RuleFor(o => o.Email, f => f.Internet.Email())
+            .RuleFor(o => o.PhoneNumber, f => f.Phone.PhoneNumber())
+            .RuleFor(o => o.Animals, animalFaker.Generate(AnimalsCount));
+
+        var ownerDtoFaker = new Faker<OwnerDto>()
+            .RuleFor(o => o.Id, Guid.NewGuid())
+            .RuleFor(o => o.FirstName, f => f.Name.FirstName())
+            .RuleFor(o => o.LastName, f => f.Name.LastName())
+            .RuleFor(o => o.Age, f => f.Random.Int(1, 100))
+            .RuleFor(o => o.Email, f => f.Internet.Email())
+            .RuleFor(o => o.PhoneNumber, f => f.Phone.PhoneNumber())
+            .RuleFor(o => o.Animals, animalDtoFaker.Generate(AnimalsCount));
 
         Id = Guid.NewGuid();
-        Animal = GetAnimal();
-        AnimalDto = GetAnimalDto();
-        AnimalsDbSet = GetAnimalsDbSet();
-        AnimalDtosQuery = GetAnimalDtosQuery();
+
+        animalFaker
+            .RuleFor(a => a.Id, Id)
+            .RuleFor(a => a.PetName, f => f.Name.FirstName())
+            .RuleFor(a => a.Kind, f => f.Name.LastName())
+            .RuleFor(a => a.Age, f => f.Random.Int(1, 100))
+            .RuleFor(a => a.Owner, ownerFaker)
+            .RuleFor(a => a.OwnerId, (f, u) => u.Owner!.Id);
+
+        animalDtoFaker
+            .RuleFor(a => a.Id, Id)
+            .RuleFor(a => a.PetName, f => f.Name.FirstName())
+            .RuleFor(a => a.Kind, f => f.Name.LastName())
+            .RuleFor(a => a.Age, f => f.Random.Int(1, 100))
+            .RuleFor(a => a.Owner, ownerDtoFaker)
+            .RuleFor(a => a.OwnerId, (f, u) => u.Owner!.Id);
+
+        Context = fixture.Freeze<Mock<AnimalRegistryContext>>();
+
+        Mapper = new MapperConfiguration(options =>
+        {
+            options.AddProfiles(new Profile[]
+            {
+                new AnimalProfile(),
+                new OwnerProfile()
+            });
+        }).CreateMapper();
+
+        AnimalsService = new AnimalsService(Context.Object, Mapper);
+
+        AnimalsCount = Random.Shared.Next(2, 20);
+        Animal = animalFaker.Generate();
+        AnimalDto = animalDtoFaker.Generate();
+        GetAllAnimalsDbSet = animalFaker.Generate(AnimalsCount).AsQueryable().BuildMockDbSet().Object;
+        GetByIdAnimalsDbSet = animalFaker.Generate(1).AsQueryable().BuildMockDbSet().Object;
     }
 
     public AnimalsService AnimalsService { get; }
     public Mock<AnimalRegistryContext> Context { get; }
-    public Mock<IMapper> Mapper { get; }
+    public IMapper Mapper { get; }
 
     public Guid Id { get; }
+    public int AnimalsCount { get; }
     public Animal Animal { get; }
     public AnimalDto AnimalDto { get; }
-    public DbSet<Animal> AnimalsDbSet { get; }
-    public IQueryable<AnimalDto> AnimalDtosQuery { get; }
-
-    private Owner GetOwner() =>
-        new()
-        {
-            Id = Id,
-            FirstName = "Ren",
-            LastName = "Amamiya",
-            Age = 16,
-            Email = "joker@gmail.com",
-            PhoneNumber = "0662931093",
-            Animals = GetAnimals()
-        };
-
-    private OwnerDto GetOwnerDto() =>
-        new()
-        {
-            Id = Id,
-            FirstName = "Ren",
-            LastName = "Amamiya",
-            Age = 16,
-            Email = "joker@gmail.com",
-            PhoneNumber = "0662931093",
-            Animals = GetAnimalDtos()
-        };
-
-    private IList<Animal> GetAnimals() =>
-        new List<Animal>
-        {
-            Animal,
-            Animal
-        };
-
-    private Animal GetAnimal() =>
-        new()
-        {
-            Id = Guid.NewGuid(),
-            PetName = "Morgana",
-            Kind = "Not a cat",
-            Age = 1,
-            Owner = GetOwner(),
-            OwnerId = Id
-        };
-
-    private AnimalDto GetAnimalDto() =>
-        new()
-        {
-            Id = Guid.NewGuid(),
-            PetName = "Morgana",
-            Kind = "Not a cat",
-            Age = 1,
-            Owner = GetOwnerDto(),
-            OwnerId = Id
-        };
-
-    private IList<AnimalDto> GetAnimalDtos() =>
-        new List<AnimalDto>
-        {
-            AnimalDto,
-            AnimalDto
-        };
-
-    private DbSet<Animal> GetAnimalsDbSet() =>
-        GetAnimals().AsQueryable().BuildMockDbSet().Object;
-
-    private IQueryable<AnimalDto> GetAnimalDtosQuery() =>
-        GetAnimalDtos().AsQueryable();
+    public DbSet<Animal> GetAllAnimalsDbSet { get; }
+    public DbSet<Animal> GetByIdAnimalsDbSet { get; }
 }

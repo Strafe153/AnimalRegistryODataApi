@@ -1,6 +1,4 @@
-﻿using Application.Services;
-using Core.DTOs;
-using Core.Entities;
+﻿using Core.DTOs;
 using Core.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Formatter;
