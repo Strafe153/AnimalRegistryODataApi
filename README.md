@@ -10,6 +10,8 @@
 * `Pomelo.EntityFrameworkCore.MySql` for MySQL
 * `Microsoft.AspNetCore.OData` for OData capabilities
 * `Microsoft.EntityFrameworkCore` for entity mapping
+* `AspNetCore.HealthChecks.UI.Client` for detailed health checks information
+* `AspNetCore.HealthChecks.MySql` for MySQL health check
 * `AutoMapper` for DTO mapping
 * `FluentValidation` for DTO validation
 * `MSTest` for unit-tests
