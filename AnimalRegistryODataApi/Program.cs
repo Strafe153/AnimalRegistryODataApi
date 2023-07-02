@@ -3,6 +3,7 @@ using AnimalRegistryODataApi.Configurations;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.ConfigureDatabase(builder.Configuration);
+builder.Services.ConfigureHealthChecks(builder.Configuration);
 
 builder.Services.ConfigureOData();
 
@@ -21,6 +22,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseHealthChecks();
 
 app.MapControllers();
 
