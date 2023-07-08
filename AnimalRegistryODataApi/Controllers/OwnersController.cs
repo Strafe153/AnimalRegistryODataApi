@@ -5,9 +5,11 @@ using Microsoft.AspNetCore.OData.Formatter;
 using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData.Results;
 using Microsoft.AspNetCore.OData.Routing.Controllers;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace AnimalRegistryODataApi.Controllers;
 
+[EnableRateLimiting("tokenBucket")]
 public class OwnersController : ODataController
 {
     private readonly IService<OwnerDto> _ownersService;

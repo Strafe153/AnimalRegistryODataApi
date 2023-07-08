@@ -4,6 +4,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.ConfigureDatabase(builder.Configuration);
 builder.Services.ConfigureHealthChecks(builder.Configuration);
+builder.Services.ConfigureRateLimiting(builder.Configuration);
 
 builder.Services.ConfigureOData();
 
@@ -25,9 +26,12 @@ if (app.Environment.IsDevelopment())
 
 app.UseHealthChecks();
 
+app.UseRateLimiter();
+
+app.UseCustomMiddleware();
+
 app.MapControllers();
 
 app.ApplyDatabaseMigration();
-app.AddCustomMiddleware();
 
 app.Run();
