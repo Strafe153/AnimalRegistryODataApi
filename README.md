@@ -24,7 +24,7 @@
 * `Microsoft.NET.Test.Sdk` for .NET SDK for testing
 * `MockQueryable.Moq` for mocking IQueryable and DbSet
 * `Moq` for mocking
-* `MSTest.TestAdapter` for adapting testing in Visual Studio
+* `MSTest.TestAdapter` for adapting tests in Visual Studio
 * `MSTest.TestFramework` for unit-tests
 * `Newtonsoft.Json` for JSON serialization
 * `Pomelo.EntityFrameworkCore.MySql` for MySQL
