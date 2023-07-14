@@ -24,7 +24,7 @@ public class OwnerValidator : AbstractValidator<OwnerDto>
             .MaximumLength(25)
             .WithMessage("Last Name must not be longer than 25 characters");
 
-        RuleFor(o => o.Age)
+        RuleFor(o => (int)o.Age)
             .GreaterThan(14)
             .WithMessage("Age must be greater than 14")
             .LessThan(100)

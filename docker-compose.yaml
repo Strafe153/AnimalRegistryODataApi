@@ -1,4 +1,5 @@
 version: '3.8'
+
 services:
   animal_registry_odata_api:
     build:
@@ -18,21 +19,20 @@ services:
     volumes:
       - ~/.aspnet/https:/https:ro
     depends_on:
-      - mysql
+      - oracle
 
-  mysql:
-    image: mysql
-    container_name: mysql
-    restart: always
-    environment:
-      MYSQL_USER: "user"
-      MYSQL_PASSWORD: "password"
-      MYSQL_ROOT_PASSWORD: "password"
-      MYSQL_DATABASE: animal_registry_db
+  oracle:
+    image: container-registry.oracle.com/database/express:21.3.0-xe
+    container_name: oracle
     ports:
-      - 3306:3306
+      - 1521:1521
+      - 5500:5500
+    environment:
+      - ORACLE_SID=XE
+      - ORACLE_PDB=XEPDB1
+      - ORACLE_PWD=pas5w0rd!
     volumes:
-      - animal_registry_db:/var/lib/mysql
+      - oracle-data:/opt/oracle/oradata
 
 volumes:
-  animal_registry_db:
+  oracle-data:

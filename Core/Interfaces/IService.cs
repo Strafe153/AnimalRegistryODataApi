@@ -1,4 +1,7 @@
-﻿namespace Core.Interfaces;
+﻿using Core.Exceptions;
+using Microsoft.AspNetCore.Http;
+
+namespace Core.Interfaces;
 
 public interface IService<T>
 {

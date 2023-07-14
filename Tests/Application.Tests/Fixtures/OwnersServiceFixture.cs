@@ -27,8 +27,7 @@ public class OwnersServiceFixture
             .RuleFor(a => a.PetName, f => f.Name.FirstName())
             .RuleFor(a => a.Kind, f => f.Name.LastName())
             .RuleFor(a => a.Age, f => f.Random.Int(1, 100))
-            .RuleFor(a => a.Owner, ownerFaker)
-            .RuleFor(a => a.OwnerId, (f, u) => u.Owner!.Id);
+            .RuleFor(a => a.Owner, ownerFaker);
 
         var animalDtoFaker = new Faker<AnimalDto>()
             .RuleFor(a => a.Id, Guid.NewGuid())

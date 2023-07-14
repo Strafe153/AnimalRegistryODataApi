@@ -23,7 +23,7 @@ public class AnimalValidator : AbstractValidator<AnimalDto>
             .MaximumLength(50)
             .WithMessage("Kind must not be longer than 50 characters");
 
-        RuleFor(o => o.Age)
+        RuleFor(o => (int)o.Age)
             .GreaterThan(0)
             .WithMessage("Age must be greater than 0")
             .LessThan(50)
