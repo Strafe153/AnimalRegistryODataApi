@@ -1,23 +1,24 @@
-﻿using AutoMapper;
+﻿using Application.Helpers;
+using AutoMapper;
 using Core.DTOs;
 using Core.Entities;
-using Core.Exceptions;
 using Core.Interfaces;
-using DataAccess;
-using Microsoft.EntityFrameworkCore;
 
 namespace Application.Services;
 
 public class OwnersService : IService<OwnerDto>
 {
-    private readonly AnimalRegistryContext _context;
+    private readonly IMapperSession<Owner> _session;
+    private readonly TransactionRunner _transactionRunner;
     private readonly IMapper _mapper;
 
     public OwnersService(
-        AnimalRegistryContext context,
+        IMapperSession<Owner> session,
+        TransactionRunner transactionRunner,
         IMapper mapper)
     {
-        _context = context;
+        _session = session;
+        _transactionRunner = transactionRunner;
         _mapper = mapper;
     }
 
@@ -25,15 +26,10 @@ public class OwnersService : IService<OwnerDto>
     {
         var owner = _mapper.Map<Owner>(createDto);
 
-        try
-        {
-            _context.Owners.Add(owner);
-            await _context.SaveChangesAsync();
-        }
-        catch (Exception)
-        {
-            throw new OperationFailedException($"Failed to create an owner.");
-        }
+        await _transactionRunner.RunInTransactionAsync(
+            async () => await _session.SaveAsync(owner),
+            _session,
+            $"Failed to create an owner.");
 
         var readDto = _mapper.Map<OwnerDto>(createDto);
         readDto.Id = owner.Id;
@@ -42,38 +38,29 @@ public class OwnersService : IService<OwnerDto>
     }
 
     public IQueryable<OwnerDto> GetAll() =>
-        _mapper.ProjectTo<OwnerDto>(
-            _context.Owners.Include(o => o.Animals));
+        _mapper.ProjectTo<OwnerDto>(_session.GetAll());
 
     public IQueryable<OwnerDto> GetById(Guid id) =>
-        _mapper.ProjectTo<OwnerDto>(
-            _context.Owners
-                .Include(o => o.Animals)
-                .Where(o => o.Id == id));
+        _mapper.ProjectTo<OwnerDto>(_session.GetById(id));
 
     public async Task DeleteAsync(Guid id)
     {
-        var owner = await _context.Owners.FindAsync(id);
+        var owner = _session.GetById(id).FirstOrDefault();
 
         if (owner is null)
         {
             throw new NullReferenceException($"Owner with id='{id}' not found.");
         }
 
-        try
-        {
-            _context.Owners.Remove(owner);
-            await _context.SaveChangesAsync();
-        }
-        catch (Exception)
-        {
-            throw new OperationFailedException($"Failed to delete owner with id='{id}'.");
-        }
+        await _transactionRunner.RunInTransactionAsync(
+            async () => await _session.DeleteAsync(owner),
+            _session,
+            $"Failed to delete owner with id='{id}'.");
     }
 
     public async Task UpdateAsync(Guid id, OwnerDto dto)
     {
-        var owner = await _context.Owners.FindAsync(id);
+        var owner = _session.GetById(id).FirstOrDefault();
 
         if (owner is null)
         {
@@ -82,14 +69,9 @@ public class OwnersService : IService<OwnerDto>
 
         _mapper.Map(dto, owner);
 
-        try
-        {
-            _context.Owners.Update(owner);
-            await _context.SaveChangesAsync();
-        }
-        catch (Exception)
-        {
-            throw new OperationFailedException($"Failed to update owner with id='{dto.Id}'.");
-        }
+        await _transactionRunner.RunInTransactionAsync(
+            async () => await _session.UpdateAsync(owner),
+            _session,
+            $"Failed to update owner with id='{dto.Id}'.");
     }
 }

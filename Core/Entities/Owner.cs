@@ -2,12 +2,12 @@
 
 public class Owner
 {
-    public Guid Id { get; set; }
-    public string? FirstName { get; set; }
-    public string? LastName { get; set; }
-    public int Age { get; set; }
-    public string? Email { get; set; }
-    public string? PhoneNumber { get; set; }
+    public virtual Guid Id { get; set; }
+    public virtual string FirstName { get; set; } = default!;
+    public virtual string LastName { get; set; } = default!;
+    public virtual byte Age { get; set; }
+    public virtual string Email { get; set; } = default!;
+    public virtual string PhoneNumber { get; set; } = default!;
 
-    public IList<Animal>? Animals { get; set; }
+    public virtual IList<Animal> Animals { get; set; } = default!;
 }

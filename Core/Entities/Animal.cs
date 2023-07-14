@@ -2,11 +2,10 @@
 
 public class Animal
 {
-    public Guid Id { get; set; }
-    public string? PetName { get; set; }
-    public string? Kind { get; set; }
-    public int Age { get; set; }
+    public virtual Guid Id { get; set; }
+    public virtual string PetName { get; set; } = string.Empty;
+    public virtual string Kind { get; set; } = string.Empty;
+    public virtual byte Age { get; set; }
 
-    public Owner? Owner { get; set; }
-    public Guid OwnerId { get; set; }
+    public virtual Owner Owner { get; set; } = default!;
 }

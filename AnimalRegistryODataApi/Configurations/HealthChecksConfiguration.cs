@@ -9,7 +9,7 @@ public static class HealthChecksConfiguration
     {
         services
             .AddHealthChecks()
-            .AddMySql(configuration.GetConnectionString("DefaultConnection")!);
+            .AddOracle(configuration.GetConnectionString("DefaultConnection")!);
     }
 
     public static void UseHealthChecks(this WebApplication application)

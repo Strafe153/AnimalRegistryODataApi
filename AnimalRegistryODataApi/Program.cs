@@ -32,6 +32,4 @@ app.UseCustomMiddleware();
 
 app.MapControllers();
 
-app.ApplyDatabaseMigration();
-
 app.Run();

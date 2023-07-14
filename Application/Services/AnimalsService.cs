@@ -1,23 +1,24 @@
-﻿using AutoMapper;
+﻿using Application.Helpers;
+using AutoMapper;
 using Core.DTOs;
 using Core.Entities;
-using Core.Exceptions;
 using Core.Interfaces;
-using DataAccess;
-using Microsoft.EntityFrameworkCore;
 
 namespace Application.Services;
 
 public class AnimalsService : IService<AnimalDto>
 {
-    private readonly AnimalRegistryContext _context;
+    private readonly IMapperSession<Animal> _session;
+    private readonly TransactionRunner _transactionRunner;
     private readonly IMapper _mapper;
 
     public AnimalsService(
-        AnimalRegistryContext context,
+        IMapperSession<Animal> session,
+        TransactionRunner transactionRunner,
         IMapper mapper)
     {
-        _context = context;
+        _session = session;
+        _transactionRunner = transactionRunner;
         _mapper = mapper;
     }
 
@@ -25,15 +26,10 @@ public class AnimalsService : IService<AnimalDto>
     {
         var animal = _mapper.Map<Animal>(dto);
 
-        try
-        {
-            _context.Animals.Add(animal);
-            await _context.SaveChangesAsync();
-        }
-        catch (Exception)
-        {
-            throw new OperationFailedException($"Failed to create an animal.");
-        }
+        await _transactionRunner.RunInTransactionAsync(
+            async () => await _session.SaveAsync(animal),
+            _session,
+            $"Failed to create an animal.");
 
         var readDto = _mapper.Map<AnimalDto>(dto);
         readDto.Id = animal.Id;
@@ -42,38 +38,29 @@ public class AnimalsService : IService<AnimalDto>
     }
 
     public IQueryable<AnimalDto> GetAll() =>
-        _mapper.ProjectTo<AnimalDto>(
-            _context.Animals.Include(a => a.Owner));
+        _mapper.ProjectTo<AnimalDto>(_session.GetAll());
 
     public IQueryable<AnimalDto> GetById(Guid id) =>
-        _mapper.ProjectTo<AnimalDto>(
-            _context.Animals
-                .Include(a => a.Owner)
-                .Where(a => a.Id == id));
+        _mapper.ProjectTo<AnimalDto>(_session.GetById(id));
 
     public async Task DeleteAsync(Guid id)
     {
-        var animal = await _context.Animals.FindAsync(id);
+        var animal = _session.GetById(id).FirstOrDefault();
 
         if (animal is null)
         {
             throw new NullReferenceException($"Animal with id='{id}' not found.");
         }
 
-        try
-        {
-            _context.Animals.Remove(animal);
-            await _context.SaveChangesAsync();
-        }
-        catch (Exception)
-        {
-            throw new OperationFailedException($"Failed to delete animal with id='{id}'.");
-        }
+        await _transactionRunner.RunInTransactionAsync(
+            async () => await _session.DeleteAsync(animal),
+            _session,
+            $"Failed to delete animal with id='{id}'.");
     }
 
     public async Task UpdateAsync(Guid id, AnimalDto dto)
     {
-        var animal = await _context.Animals.FindAsync(id);
+        var animal = _session.GetById(id).FirstOrDefault();
 
         if (animal is null)
         {
@@ -82,14 +69,9 @@ public class AnimalsService : IService<AnimalDto>
 
         _mapper.Map(dto, animal);
 
-        try
-        {
-            _context.Update(animal);
-            await _context.SaveChangesAsync();
-        }
-        catch (Exception)
-        {
-            throw new OperationFailedException($"Failed to update animalQueryable with id='{dto.Id}'.");
-        }
+        await _transactionRunner.RunInTransactionAsync(
+            async () => await _session.UpdateAsync(animal),
+            _session,
+            $"Failed to update animalQueryable with id='{dto.Id}'.");
     }
 }
