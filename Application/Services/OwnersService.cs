@@ -3,7 +3,6 @@ using AutoMapper;
 using Core.DTOs;
 using Core.Entities;
 using Core.Interfaces;
-using NHibernate.Linq;
 
 namespace Application.Services;
 
@@ -46,7 +45,7 @@ public class OwnersService : IService<OwnerDto>
 
     public async Task DeleteAsync(Guid id)
     {
-        var owner = await _session.GetById(id).FirstOrDefaultAsync();
+        var owner = _session.GetById(id).FirstOrDefault();
 
         if (owner is null)
         {
@@ -54,14 +53,14 @@ public class OwnersService : IService<OwnerDto>
         }
 
         await _transactionRunner.RunInTransactionAsync(
-            async () => await _session.SaveAsync(owner),
+            async () => await _session.DeleteAsync(owner),
             _session,
             $"Failed to delete owner with id='{id}'.");
     }
 
     public async Task UpdateAsync(Guid id, OwnerDto dto)
     {
-        var owner = await _session.GetById(id).FirstOrDefaultAsync();
+        var owner = _session.GetById(id).FirstOrDefault();
 
         if (owner is null)
         {

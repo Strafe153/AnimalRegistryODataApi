@@ -1,7 +1,7 @@
 ﻿using Application.Tests.Fixtures;
-using Core.DTOs;
 using Core.Entities;
 using Core.Exceptions;
+using Core.Interfaces;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
@@ -22,9 +22,9 @@ public class OwnersServiceTests
     public void GetAll_Should_ReturnIQueryableOfOwnerDto()
     {
         // Arrange
-        _fixture.Context
-            .Setup(c => c.Owners)
-            .Returns(_fixture.GetAllOwnersDbSet);
+        _fixture.Session
+            .Setup(s => s.GetAll())
+            .Returns(_fixture.GetAllOwnersQuery);
 
         // Act
         var result = _fixture.OwnersService.GetAll();
@@ -37,9 +37,9 @@ public class OwnersServiceTests
     public void GetById_Should_ReturnIQueryableOfOwnerDto()
     {
         // Arrange
-        _fixture.Context
-            .Setup(c => c.Owners)
-            .Returns(_fixture.GetByIdOwnersDbSet);
+        _fixture.Session
+            .Setup(s => s.GetById(It.IsAny<Guid>()))
+            .Returns(_fixture.GetByIdOwnersQuery);
 
         // Act
         var result = _fixture.OwnersService.GetById(_fixture.Id);
@@ -51,15 +51,6 @@ public class OwnersServiceTests
     [TestMethod]
     public async Task CreateAsync_Should_ReturnOwnerDto_WhenOwnerDtoIsValid()
     {
-        // Arrange
-        _fixture.Context
-            .Setup(c => c.Owners)
-            .Returns(_fixture.GetAllOwnersDbSet);
-
-        _fixture.Context
-            .Setup(c => c.SaveChangesAsync(It.IsAny<CancellationToken>()))
-            .ReturnsAsync(1);
-
         // Act
         var result = await _fixture.OwnersService.CreateAsync(_fixture.OwnerDto);
 
@@ -71,8 +62,15 @@ public class OwnersServiceTests
     public async Task CreateAsync_Should_ThrowOperationFailedException_WhenOwnerDtoIsInvalid()
     {
         // Arrange
-        _fixture.Context
-            .Setup(c => c.Owners.Add(It.IsAny<Owner>()))
+        _fixture.Session
+            .Setup(c => c.GetById(It.IsAny<Guid>()))
+            .Returns(_fixture.GetByIdOwnersQuery);
+
+        _fixture.TransactionRunner
+            .Setup(r => r.RunInTransactionAsync(
+                It.IsAny<Func<Task>>(),
+                It.IsAny<IMapperSession<Owner>>(),
+                It.IsAny<string>()))
             .Throws(new OperationFailedException(_fixture.Id.ToString()));
 
         // Act
@@ -85,6 +83,11 @@ public class OwnersServiceTests
     [TestMethod]
     public async Task UpdateAsync_Should_ReturnTask_WhenOwnerDtoIsValid()
     {
+        // Arrange
+        _fixture.Session
+            .Setup(s => s.GetById(It.IsAny<Guid>()))
+            .Returns(_fixture.GetByIdOwnersQuery);
+
         // Act
         var result = async () => await _fixture.OwnersService.UpdateAsync(_fixture.Id, _fixture.OwnerDto);
 
@@ -97,13 +100,9 @@ public class OwnersServiceTests
     public async Task UpdateAsync_Should_ThrowNullReferenceException_WhenOwnerDoesNotExist()
     {
         // Arrange
-        _fixture.Context
-            .Setup(c => c.Owners)
-            .Returns(_fixture.GetAllOwnersDbSet);
-
-        _fixture.Context
-            .Setup(c => c.Owners.FindAsync(It.IsAny<object[]>()))
-            .ReturnsAsync((Owner)null!);
+        _fixture.Session
+            .Setup(s => s.GetById(It.IsAny<Guid>()))
+            .Returns(_fixture.GetByIdEmptyOwnersQuery);
 
         // Act
         var result = async () => await _fixture.OwnersService.UpdateAsync(_fixture.Id, _fixture.OwnerDto);
@@ -116,13 +115,16 @@ public class OwnersServiceTests
     public async Task UpdateAsync_Should_ThrowOperationFailedException_WhenOwnerDtoIsInvalid()
     {
         // Arrange
-        _fixture.Context
-            .Setup(c => c.Owners)
-            .Returns(_fixture.GetAllOwnersDbSet);
+        _fixture.Session
+            .Setup(s => s.GetById(It.IsAny<Guid>()))
+            .Returns(_fixture.GetByIdOwnersQuery);
 
-        _fixture.Context
-            .Setup(c => c.Owners.FindAsync(It.IsAny<object[]>()))
-            .ReturnsAsync(_fixture.Owner);
+        _fixture.TransactionRunner
+            .Setup(r => r.RunInTransactionAsync(
+                It.IsAny<Func<Task>>(),
+                It.IsAny<IMapperSession<Owner>>(),
+                It.IsAny<string>()))
+            .Throws(new OperationFailedException(_fixture.Id.ToString()));
 
         // Act
         var result = async () => await _fixture.OwnersService.UpdateAsync(_fixture.Id, _fixture.OwnerDto);
@@ -134,6 +136,11 @@ public class OwnersServiceTests
     [TestMethod]
     public async Task DeleteAsync_Should_ReturnTask_WhenOwnerDtoIsValid()
     {
+        // Arrange
+        _fixture.Session
+            .Setup(s => s.GetById(It.IsAny<Guid>()))
+            .Returns(_fixture.GetByIdOwnersQuery);
+
         // Act
         var result = async () => await _fixture.OwnersService.DeleteAsync(_fixture.Id);
 
@@ -146,13 +153,16 @@ public class OwnersServiceTests
     public async Task DeleteAsync_Should_ThrowOperationFailedException_WhenOperationFails()
     {
         // Arrange
-        _fixture.Context
-            .Setup(c => c.Owners)
-            .Returns(_fixture.GetAllOwnersDbSet);
+        _fixture.Session
+            .Setup(s => s.GetById(It.IsAny<Guid>()))
+            .Returns(_fixture.GetByIdOwnersQuery);
 
-        _fixture.Context
-            .Setup(c => c.Owners.FindAsync(It.IsAny<object[]>()))
-            .ReturnsAsync(_fixture.Owner);
+        _fixture.TransactionRunner
+            .Setup(r => r.RunInTransactionAsync(
+                It.IsAny<Func<Task>>(),
+                It.IsAny<IMapperSession<Owner>>(),
+                It.IsAny<string>()))
+            .Throws(new OperationFailedException(_fixture.Id.ToString()));
 
         // Act
         var result = async () => await _fixture.OwnersService.DeleteAsync(_fixture.Id);
@@ -165,13 +175,9 @@ public class OwnersServiceTests
     public async Task DeleteAsync_Should_ThrowNullReferenceException_WhenOwnerDoesNotExist()
     {
         // Arrange
-        _fixture.Context
-            .Setup(c => c.Owners)
-            .Returns(_fixture.GetAllOwnersDbSet);
-
-        _fixture.Context
-            .Setup(c => c.Owners.FindAsync(It.IsAny<object[]>()))
-            .ReturnsAsync((Owner)null!);
+        _fixture.Session
+            .Setup(s => s.GetById(It.IsAny<Guid>()))
+            .Returns(_fixture.GetByIdEmptyOwnersQuery);
 
         // Act
         var result = async () => await _fixture.OwnersService.DeleteAsync(_fixture.Id);

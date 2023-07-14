@@ -41,7 +41,10 @@ public class AnimalMapperSession : IMapperSession<Animal>
         await _session.DeleteAsync(entity);
 
     public IQueryable<Animal> GetAll() =>
-        _session.Query<Animal>().Fetch(a => a.Owner);
+        _session.Query<Animal>()
+            .Fetch(a => a.Owner)
+            .ToFuture()
+            .AsQueryable();
 
     public IQueryable<Animal> GetById(Guid id) =>
         GetAll().Where(a => a.Id == id);

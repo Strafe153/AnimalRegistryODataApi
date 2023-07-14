@@ -1,6 +1,6 @@
 ﻿using Core.Entities;
 using Core.Interfaces;
-using DataAccess;
+using DataAccess.EntityMappings;
 using DataAccess.MapperSessions;
 using NHibernate.Cfg;
 using NHibernate.Dialect;
@@ -15,7 +15,7 @@ public static class DatabaseConfiguration
     public static void ConfigureDatabase(this IServiceCollection services, IConfiguration configuration)
     {
         var mapper = new ModelMapper();
-        mapper.AddMappings(typeof(AssemblyReference).Assembly.ExportedTypes);
+        mapper.AddMappings(typeof(AnimalMapping).Assembly.ExportedTypes);
 
         var domainMapping = mapper.CompileMappingForAllExplicitlyAddedEntities();
 

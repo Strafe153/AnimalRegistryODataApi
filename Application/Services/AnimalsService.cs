@@ -3,7 +3,6 @@ using AutoMapper;
 using Core.DTOs;
 using Core.Entities;
 using Core.Interfaces;
-using NHibernate.Linq;
 
 namespace Application.Services;
 
@@ -29,7 +28,8 @@ public class AnimalsService : IService<AnimalDto>
 
         await _transactionRunner.RunInTransactionAsync(
             async () => await _session.SaveAsync(animal),
-            _session, $"Failed to create an animal.");
+            _session,
+            $"Failed to create an animal.");
 
         var readDto = _mapper.Map<AnimalDto>(dto);
         readDto.Id = animal.Id;
@@ -45,7 +45,7 @@ public class AnimalsService : IService<AnimalDto>
 
     public async Task DeleteAsync(Guid id)
     {
-        var animal = await _session.GetById(id).FirstOrDefaultAsync();
+        var animal = _session.GetById(id).FirstOrDefault();
 
         if (animal is null)
         {
@@ -60,7 +60,7 @@ public class AnimalsService : IService<AnimalDto>
 
     public async Task UpdateAsync(Guid id, AnimalDto dto)
     {
-        var animal = await _session.GetById(id).FirstOrDefaultAsync();
+        var animal = _session.GetById(id).FirstOrDefault();
 
         if (animal is null)
         {

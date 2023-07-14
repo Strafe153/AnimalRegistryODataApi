@@ -5,7 +5,10 @@ namespace Application.Helpers;
 
 public class TransactionRunner
 {
-    public async Task RunInTransactionAsync<T>(Func<Task> method, IMapperSession<T> session, string exceptionMessage)
+    public virtual async Task RunInTransactionAsync<T>(
+        Func<Task> method,
+        IMapperSession<T> session,
+        string exceptionMessage)
     {
         try
         {

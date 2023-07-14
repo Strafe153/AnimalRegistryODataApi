@@ -20,7 +20,7 @@ public class AnimalsControllerFixture
             .RuleFor(o => o.Id, Guid.NewGuid())
             .RuleFor(o => o.FirstName, f => f.Name.FirstName())
             .RuleFor(o => o.LastName, f => f.Name.LastName())
-            .RuleFor(o => o.Age, f => f.Random.Int(1, 100))
+            .RuleFor(o => o.Age, f => f.Random.Byte())
             .RuleFor(o => o.Email, f => f.Internet.Email())
             .RuleFor(o => o.PhoneNumber, f => f.Phone.PhoneNumber())
             .RuleFor(o => o.Animals, animalDtoFaker.Generate(AnimalDtosCount));
@@ -29,7 +29,7 @@ public class AnimalsControllerFixture
             .RuleFor(a => a.Id, Id)
             .RuleFor(a => a.PetName, f => f.Name.FirstName())
             .RuleFor(a => a.Kind, f => f.Name.LastName())
-            .RuleFor(a => a.Age, f => f.Random.Int(1, 100))
+            .RuleFor(a => a.Age, f => f.Random.Byte())
             .RuleFor(a => a.Owner, ownerDtoFaker)
             .RuleFor(a => a.OwnerId, (f, u) => u.Owner!.Id);
 
