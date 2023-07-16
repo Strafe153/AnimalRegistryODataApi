@@ -17,6 +17,7 @@
 * `Microsoft.AspNetCore.Mvc` for ProblemDetails
 * `Microsoft.AspNetCore.OData` for OData capabilities
 * `Microsoft.AspNetCore.OpenApi` for Open API support
+* `Microsoft.Extensions.Logging.Log4Net.AspNetCore` for log4net
 * `Microsoft.NET.Test.Sdk` for .NET SDK for testing
 * `MockQueryable.Moq` for mocking IQueryable and DbSet
 * `Moq` for mocking
