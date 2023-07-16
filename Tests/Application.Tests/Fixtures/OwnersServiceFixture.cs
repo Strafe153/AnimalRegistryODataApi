@@ -8,8 +8,7 @@ using Bogus;
 using Core.DTOs;
 using Core.Entities;
 using Core.Interfaces;
-using Microsoft.EntityFrameworkCore;
-using MockQueryable.Moq;
+using Microsoft.Extensions.Logging;
 using Moq;
 
 namespace Application.Tests.Fixtures;
@@ -68,8 +67,13 @@ public class OwnersServiceFixture
                 new AnimalProfile()
             });
         }).CreateMapper();
+        Logger = fixture.Freeze<Mock<ILogger<OwnersService>>>();
 
-        OwnersService = new OwnersService(Session.Object, TransactionRunner.Object, Mapper);
+        OwnersService = new OwnersService(
+            Session.Object,
+            TransactionRunner.Object,
+            Mapper,
+            Logger.Object);
 
         OwnersCount = Random.Shared.Next(2, 20);
         Owner = ownerFaker.Generate();
@@ -82,6 +86,7 @@ public class OwnersServiceFixture
     public OwnersService OwnersService { get; }
     public Mock<IMapperSession<Owner>> Session { get; }
     public Mock<TransactionRunner> TransactionRunner { get; }
+    public Mock<ILogger<OwnersService>> Logger { get; }
     public IMapper Mapper { get; }
 
     public Guid Id { get; }

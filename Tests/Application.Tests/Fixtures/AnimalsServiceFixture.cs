@@ -8,6 +8,7 @@ using Bogus;
 using Core.DTOs;
 using Core.Entities;
 using Core.Interfaces;
+using Microsoft.Extensions.Logging;
 using Moq;
 
 namespace Application.Tests.Fixtures;
@@ -66,8 +67,13 @@ public class AnimalsServiceFixture
                 new OwnerProfile()
             });
         }).CreateMapper();
+        Logger = fixture.Freeze<Mock<ILogger<AnimalsService>>>();
 
-        AnimalsService = new AnimalsService(Session.Object, TransactionRunner.Object, Mapper);
+        AnimalsService = new AnimalsService(
+            Session.Object,
+            TransactionRunner.Object,
+            Mapper,
+            Logger.Object);
 
         AnimalsCount = Random.Shared.Next(2, 20);
         AnimalDto = animalDtoFaker.Generate();
@@ -79,6 +85,7 @@ public class AnimalsServiceFixture
     public AnimalsService AnimalsService { get; }
     public Mock<IMapperSession<Animal>> Session { get; }
     public Mock<TransactionRunner> TransactionRunner { get; }
+    public Mock<ILogger<AnimalsService>> Logger { get; }
     public IMapper Mapper { get; }
 
     public Guid Id { get; }
