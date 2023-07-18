@@ -97,6 +97,22 @@ public class OwnersServiceTests
     }
 
     [TestMethod]
+    public async Task UpdateAsync_Should_ReturnTask_WhenOwnerDeltaIsValid()
+    {
+        // Arrange
+        _fixture.Session
+            .Setup(s => s.GetById(It.IsAny<Guid>()))
+            .Returns(_fixture.GetByIdOwnersQuery);
+
+        // Act
+        var result = async () => await _fixture.OwnersService.UpdateAsync(_fixture.Id, _fixture.OwnerDtoDelta);
+
+        // Assert
+        await result.Should().NotThrowAsync<NullReferenceException>();
+        await result.Should().NotThrowAsync<OperationFailedException>();
+    }
+
+    [TestMethod]
     public async Task UpdateAsync_Should_ThrowNullReferenceException_WhenOwnerDoesNotExist()
     {
         // Arrange
@@ -106,6 +122,21 @@ public class OwnersServiceTests
 
         // Act
         var result = async () => await _fixture.OwnersService.UpdateAsync(_fixture.Id, _fixture.OwnerDto);
+
+        // Assert
+        await result.Should().ThrowAsync<NullReferenceException>();
+    }
+
+    [TestMethod]
+    public async Task UpdateAsync_Should_ThrowNullReferenceException_WithDeltaWhenOwnerDoesNotExist()
+    {
+        // Arrange
+        _fixture.Session
+            .Setup(s => s.GetById(It.IsAny<Guid>()))
+            .Returns(_fixture.GetByIdEmptyOwnersQuery);
+
+        // Act
+        var result = async () => await _fixture.OwnersService.UpdateAsync(_fixture.Id, _fixture.OwnerDtoDelta);
 
         // Assert
         await result.Should().ThrowAsync<NullReferenceException>();
@@ -128,6 +159,28 @@ public class OwnersServiceTests
 
         // Act
         var result = async () => await _fixture.OwnersService.UpdateAsync(_fixture.Id, _fixture.OwnerDto);
+
+        // Assert
+        await result.Should().ThrowAsync<OperationFailedException>();
+    }
+
+    [TestMethod]
+    public async Task UpdateAsync_Should_ThrowOperationFailedException_WhenOwnerDeltaIsInvalid()
+    {
+        // Arrange
+        _fixture.Session
+            .Setup(s => s.GetById(It.IsAny<Guid>()))
+            .Returns(_fixture.GetByIdOwnersQuery);
+
+        _fixture.TransactionRunner
+            .Setup(r => r.RunInTransactionAsync(
+                It.IsAny<Func<Task>>(),
+                It.IsAny<IMapperSession<Owner>>(),
+                It.IsAny<string>()))
+            .Throws(new OperationFailedException(_fixture.Id.ToString()));
+
+        // Act
+        var result = async () => await _fixture.OwnersService.UpdateAsync(_fixture.Id, _fixture.OwnerDtoDelta);
 
         // Assert
         await result.Should().ThrowAsync<OperationFailedException>();

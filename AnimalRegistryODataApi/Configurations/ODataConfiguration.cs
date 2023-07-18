@@ -17,8 +17,9 @@ public static class ODataConfiguration
         services
             .AddControllers()
             .AddOData(options =>
-                options
-                    .EnableQueryFeatures(null)
-                    .AddRouteComponents("odata", edmModel));
+            {
+                options.EnableQueryFeatures(null);
+                options.AddRouteComponents("odata/v1", edmModel);
+            });
     }
 }
