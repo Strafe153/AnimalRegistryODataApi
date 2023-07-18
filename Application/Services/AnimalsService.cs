@@ -3,6 +3,7 @@ using AutoMapper;
 using Core.DTOs;
 using Core.Entities;
 using Core.Interfaces;
+using Microsoft.AspNetCore.OData.Deltas;
 using Microsoft.Extensions.Logging;
 
 namespace Application.Services;
@@ -92,7 +93,30 @@ public class AnimalsService : IService<AnimalDto>
         await _transactionRunner.RunInTransactionAsync(
             async () => await _session.UpdateAsync(animal),
             _session,
-            $"Failed to update animalQueryable with id='{dto.Id}'.");
+            $"Failed to update animalQueryable with id='{id}'.");
+
+        _logger.LogInformation("Successfully updated an animal with id={Id}", id);
+    }
+
+    public async Task UpdateAsync(Guid id, Delta<AnimalDto> delta)
+    {
+        var animal = _session.GetById(id).FirstOrDefault();
+
+        if (animal is null)
+        {
+            _logger.LogWarning("Failed to retrieve an animal with id {Id}", id);
+            throw new NullReferenceException($"Animal with id='{id}' not found.");
+        }
+
+        var dto = _mapper.Map<AnimalDto>(animal);
+
+        delta.Patch(dto);
+        _mapper.Map(dto, animal);
+
+        await _transactionRunner.RunInTransactionAsync(
+            async () => await _session.UpdateAsync(animal),
+            _session,
+            $"Failed to update animal with id='{id}'.");
 
         _logger.LogInformation("Successfully updated an animal with id={Id}", id);
     }

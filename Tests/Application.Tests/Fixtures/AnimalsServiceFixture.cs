@@ -8,6 +8,7 @@ using Bogus;
 using Core.DTOs;
 using Core.Entities;
 using Core.Interfaces;
+using Microsoft.AspNetCore.OData.Deltas;
 using Microsoft.Extensions.Logging;
 using Moq;
 
@@ -77,6 +78,7 @@ public class AnimalsServiceFixture
 
         AnimalsCount = Random.Shared.Next(2, 20);
         AnimalDto = animalDtoFaker.Generate();
+        AnimalDtoDelta = new Delta<AnimalDto>();
         GetAllAnimalsQuery = animalFaker.Generate(AnimalsCount).AsQueryable();
         GetByIdAnimalsQuery = animalFaker.Generate(1).AsQueryable();
         GetByIdEmptyAnimalsQuery = animalFaker.Generate(0).AsQueryable();
@@ -91,6 +93,7 @@ public class AnimalsServiceFixture
     public Guid Id { get; }
     public int AnimalsCount { get; }
     public AnimalDto AnimalDto { get; }
+    public Delta<AnimalDto> AnimalDtoDelta { get; }
     public IQueryable<Animal> GetAllAnimalsQuery { get; }
     public IQueryable<Animal> GetByIdAnimalsQuery { get; }
     public IQueryable<Animal> GetByIdEmptyAnimalsQuery { get; }

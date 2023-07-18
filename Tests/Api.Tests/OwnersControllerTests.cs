@@ -89,6 +89,18 @@ public class OwnersControllerTests
     }
 
     [TestMethod]
+    public async Task Patch_Should_ReturnNoContentResult_WhenOwnerExists()
+    {
+        // Act
+        var result = await _fixture.OwnersController.Patch(_fixture.Id, _fixture.OwnerDtoDelta);
+        var objectResult = result.As<NoContentResult>();
+
+        // Assert
+        result.Should().NotBeNull().And.BeOfType<NoContentResult>();
+        objectResult.StatusCode.Should().Be(204);
+    }
+
+    [TestMethod]
     public async Task Delete_Should_ReturnNoContentResult_WhenOwnerExists()
     {
         // Act

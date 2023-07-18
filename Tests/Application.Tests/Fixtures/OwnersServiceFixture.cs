@@ -8,6 +8,7 @@ using Bogus;
 using Core.DTOs;
 using Core.Entities;
 using Core.Interfaces;
+using Microsoft.AspNetCore.OData.Deltas;
 using Microsoft.Extensions.Logging;
 using Moq;
 
@@ -78,6 +79,7 @@ public class OwnersServiceFixture
         OwnersCount = Random.Shared.Next(2, 20);
         Owner = ownerFaker.Generate();
         OwnerDto = ownerDtoFaker.Generate();
+        OwnerDtoDelta = new Delta<OwnerDto>();
         GetAllOwnersQuery = ownerFaker.Generate(OwnersCount).AsQueryable();
         GetByIdOwnersQuery = ownerFaker.Generate(1).AsQueryable();
         GetByIdEmptyOwnersQuery = ownerFaker.Generate(0).AsQueryable();
@@ -93,6 +95,7 @@ public class OwnersServiceFixture
     public int OwnersCount { get; }
     public Owner Owner { get; }
     public OwnerDto OwnerDto { get; }
+    public Delta<OwnerDto> OwnerDtoDelta { get; }
     public IQueryable<Owner> GetAllOwnersQuery { get; }
     public IQueryable<Owner> GetByIdOwnersQuery { get; }
     public IQueryable<Owner> GetByIdEmptyOwnersQuery { get; }

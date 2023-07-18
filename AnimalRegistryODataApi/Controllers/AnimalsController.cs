@@ -1,6 +1,7 @@
 ﻿using Core.DTOs;
 using Core.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.OData.Deltas;
 using Microsoft.AspNetCore.OData.Formatter;
 using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData.Results;
@@ -36,6 +37,12 @@ public class AnimalsController : ODataController
     public async Task<ActionResult> Put([FromODataUri] Guid key, [FromBody] AnimalDto updateDto)
     {
         await _animalsService.UpdateAsync(key, updateDto);
+        return NoContent();
+    }
+
+    public async Task<ActionResult> Patch([FromODataUri] Guid key, [FromBody] Delta<AnimalDto> delta)
+    {
+        await _animalsService.UpdateAsync(key, delta);
         return NoContent();
     }
 

@@ -3,6 +3,7 @@ using AutoMapper;
 using Core.DTOs;
 using Core.Entities;
 using Core.Interfaces;
+using Microsoft.AspNetCore.OData.Deltas;
 using Microsoft.Extensions.Logging;
 
 namespace Application.Services;
@@ -91,7 +92,30 @@ public class OwnersService : IService<OwnerDto>
         await _transactionRunner.RunInTransactionAsync(
             async () => await _session.UpdateAsync(owner),
             _session,
-            $"Failed to update owner with id='{dto.Id}'.");
+            $"Failed to update owner with id='{id}'.");
+
+        _logger.LogInformation("Successfully updated an owner with id={Id}", id);
+    }
+
+    public async Task UpdateAsync(Guid id, Delta<OwnerDto> delta)
+    {
+        var owner = _session.GetById(id).FirstOrDefault();
+
+        if (owner is null)
+        {
+            _logger.LogWarning("Failed to retrieve an owner with id {Id}", id);
+            throw new NullReferenceException($"Owner with id='{id}' not found.");
+        }
+
+        var dto = _mapper.Map<OwnerDto>(owner);
+
+        delta.Patch(dto);
+        _mapper.Map(dto, owner);
+
+        await _transactionRunner.RunInTransactionAsync(
+            async () => await _session.UpdateAsync(owner),
+            _session,
+            $"Failed to update owner with id='{id}'.");
 
         _logger.LogInformation("Successfully updated an owner with id={Id}", id);
     }

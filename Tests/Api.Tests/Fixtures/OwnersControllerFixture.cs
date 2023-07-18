@@ -4,6 +4,7 @@ using AutoFixture.AutoMoq;
 using Bogus;
 using Core.DTOs;
 using Core.Interfaces;
+using Microsoft.AspNetCore.OData.Deltas;
 using Moq;
 
 namespace Api.Tests.Fixtures;
@@ -40,6 +41,7 @@ public class OwnersControllerFixture
         Id = Guid.NewGuid();
         OwnerDtosCount = Random.Shared.Next(2, 20);
         OwnerDto = ownerDtoFaker.Generate();
+        OwnerDtoDelta = new Delta<OwnerDto>();
         AnimalDto = animalDtoFaker.Generate();
         OwnerDtos = ownerDtoFaker.Generate(OwnerDtosCount);
         OwnerDtoQuery = OwnerDtos.AsQueryable();
@@ -51,6 +53,7 @@ public class OwnersControllerFixture
     public Guid Id { get; }
     public int OwnerDtosCount { get; }
     public OwnerDto OwnerDto { get; }
+    public Delta<OwnerDto> OwnerDtoDelta { get; }
     public AnimalDto AnimalDto { get; }
     public IList<OwnerDto> OwnerDtos { get; }
     public IQueryable<OwnerDto> OwnerDtoQuery { get; }

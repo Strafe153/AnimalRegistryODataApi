@@ -98,6 +98,22 @@ public class AnimalsServiceTests
     }
 
     [TestMethod]
+    public async Task UpdateAsync_Should_ReturnTask_WhenAnimalDeltaIsValid()
+    {
+        // Arrange
+        _fixture.Session
+            .Setup(c => c.GetById(It.IsAny<Guid>()))
+            .Returns(_fixture.GetByIdAnimalsQuery);
+
+        // Act
+        var result = async () => await _fixture.AnimalsService.UpdateAsync(_fixture.Id, _fixture.AnimalDtoDelta);
+
+        // Assert
+        await result.Should().NotThrowAsync<NullReferenceException>();
+        await result.Should().NotThrowAsync<OperationFailedException>();
+    }
+
+    [TestMethod]
     public async Task UpdateAsync_Should_ThrowNullReferenceException_WhenAnimalDoesNotExist()
     {
         // Arrange
@@ -107,6 +123,21 @@ public class AnimalsServiceTests
 
         // Act
         var result = async () => await _fixture.AnimalsService.UpdateAsync(_fixture.Id, _fixture.AnimalDto);
+
+        // Assert
+        await result.Should().ThrowAsync<NullReferenceException>();
+    }
+
+    [TestMethod]
+    public async Task UpdateAsync_Should_ThrowNullReferenceException_WithDeltaWhenAnimalDoesNotExist()
+    {
+        // Arrange
+        _fixture.Session
+            .Setup(s => s.GetById(It.IsAny<Guid>()))
+            .Returns(_fixture.GetByIdEmptyAnimalsQuery);
+
+        // Act
+        var result = async () => await _fixture.AnimalsService.UpdateAsync(_fixture.Id, _fixture.AnimalDtoDelta);
 
         // Assert
         await result.Should().ThrowAsync<NullReferenceException>();
@@ -129,6 +160,28 @@ public class AnimalsServiceTests
 
         // Act
         var result = async () => await _fixture.AnimalsService.UpdateAsync(_fixture.Id, _fixture.AnimalDto);
+
+        // Assert
+        await result.Should().ThrowAsync<OperationFailedException>();
+    }
+
+    [TestMethod]
+    public async Task UpdateAsync_Should_ThrowOperationFailedException_WhenAnimalDeltaIsInvalid()
+    {
+        // Arrange
+        _fixture.Session
+            .Setup(c => c.GetById(It.IsAny<Guid>()))
+            .Returns(_fixture.GetByIdAnimalsQuery);
+
+        _fixture.TransactionRunner
+            .Setup(r => r.RunInTransactionAsync(
+                It.IsAny<Func<Task>>(),
+                It.IsAny<IMapperSession<Animal>>(),
+                It.IsAny<string>()))
+            .Throws(new OperationFailedException(_fixture.Id.ToString()));
+
+        // Act
+        var result = async () => await _fixture.AnimalsService.UpdateAsync(_fixture.Id, _fixture.AnimalDtoDelta);
 
         // Assert
         await result.Should().ThrowAsync<OperationFailedException>();

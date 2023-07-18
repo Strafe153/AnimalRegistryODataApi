@@ -89,6 +89,18 @@ public class AnimalsControllerTests
     }
 
     [TestMethod]
+    public async Task Patch_Should_ReturnNoContentResult_WhenAnimalExists()
+    {
+        // Act
+        var result = await _fixture.AnimalsController.Patch(_fixture.Id, _fixture.AnimalDtoDelta);
+        var objectResult = result.As<NoContentResult>();
+
+        // Assert
+        result.Should().NotBeNull().And.BeOfType<NoContentResult>();
+        objectResult.StatusCode.Should().Be(204);
+    }
+
+    [TestMethod]
     public async Task Delete_Should_ReturnNoContentResult_WhenAnimalExists()
     {
         // Act
