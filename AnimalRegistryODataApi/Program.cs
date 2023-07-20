@@ -1,4 +1,5 @@
 using AnimalRegistryODataApi.Configurations;
+using Microsoft.AspNetCore.OData;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -31,6 +32,9 @@ if (app.Environment.IsDevelopment())
 app.UseHealthChecks();
 
 app.UseRateLimiter();
+
+app.UseODataBatching();
+app.UseRouting();
 
 app.MapControllers();
 
