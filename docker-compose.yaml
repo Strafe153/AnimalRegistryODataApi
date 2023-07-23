@@ -15,7 +15,7 @@ services:
       - ASPNETCORE_HTTPS_PORT=8081
       - ASPNETCORE_Kestrel__Certificates__Default__Password=crypticpassword
       - ASPNETCORE_Kestrel__Certificates__Default__Path=/https/AnimalRegistryODataApi.pfx
-      - "ConnectionStrings:DefaultConnection=Server=mysql;Database=animal_registry_db;user ID=user;Password=password;"
+      - ConnectionStrings__DefaultConnection=Data Source=oracle:1521/XE;User Id=system;Password=pas5w0rd!;
     volumes:
       - ~/.aspnet/https:/https:ro
     depends_on:
