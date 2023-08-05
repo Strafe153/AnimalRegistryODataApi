@@ -1,6 +1,7 @@
 ﻿using Api.Tests.Fixtures;
 using Core.DTOs;
 using FluentAssertions;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Results;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -33,7 +34,7 @@ public class AnimalsControllerTests
 
         // Assert
         result.Should().BeOfType<ActionResult<IQueryable<AnimalDto>>>();
-        objectResult.StatusCode.Should().Be(200);
+        objectResult.StatusCode.Should().Be(StatusCodes.Status200OK);
         queryResult.Should().NotBeNull();
         queryResult.Count().Should().Be(_fixture.AnimalDtosCount);
     }
@@ -53,7 +54,7 @@ public class AnimalsControllerTests
 
         // Assert
         result.Should().NotBeNull().And.BeOfType<ActionResult<SingleResult<AnimalDto>>>();
-        objectResult.StatusCode.Should().Be(200);
+        objectResult.StatusCode.Should().Be(StatusCodes.Status200OK);
         singleResult.Should().NotBeNull();
     }
 
@@ -72,7 +73,7 @@ public class AnimalsControllerTests
 
         // Assert
         result.Should().NotBeNull().And.BeOfType<ActionResult<AnimalDto>>();
-        objectResult.StatusCode.Should().Be(201);
+        objectResult.StatusCode.Should().Be(StatusCodes.Status201Created);
         ownerDto.Should().NotBeNull();
     }
 
@@ -85,7 +86,7 @@ public class AnimalsControllerTests
 
         // Assert
         result.Should().NotBeNull().And.BeOfType<NoContentResult>();
-        objectResult.StatusCode.Should().Be(204);
+        objectResult.StatusCode.Should().Be(StatusCodes.Status204NoContent);
     }
 
     [TestMethod]
@@ -97,7 +98,7 @@ public class AnimalsControllerTests
 
         // Assert
         result.Should().NotBeNull().And.BeOfType<NoContentResult>();
-        objectResult.StatusCode.Should().Be(204);
+        objectResult.StatusCode.Should().Be(StatusCodes.Status204NoContent);
     }
 
     [TestMethod]
@@ -109,6 +110,6 @@ public class AnimalsControllerTests
 
         // Assert
         result.Should().NotBeNull().And.BeOfType<NoContentResult>();
-        objectResult.StatusCode.Should().Be(204);
+        objectResult.StatusCode.Should().Be(StatusCodes.Status204NoContent);
     }
 }
