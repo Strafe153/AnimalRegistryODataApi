@@ -10,6 +10,7 @@ builder.Services.ConfigureHealthChecks(builder.Configuration);
 builder.Services.ConfigureRateLimiting(builder.Configuration);
 
 builder.Services.ConfigureOData();
+builder.Services.AddResponseCaching();
 
 builder.Services.ConfigureCustomServices();
 
@@ -36,6 +37,8 @@ app.UseRateLimiter();
 app.UseODataBatching();
 app.UseODataRouteDebug();
 app.UseRouting();
+
+app.UseResponseCaching();
 
 app.MapControllers();
 

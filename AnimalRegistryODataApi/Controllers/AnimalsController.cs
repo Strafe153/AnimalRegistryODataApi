@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.RateLimiting;
 namespace AnimalRegistryODataApi.Controllers;
 
 [EnableRateLimiting("tokenBucket")]
+[ResponseCache(CacheProfileName = "Default")]
 public class AnimalsController : ODataController
 {
     private readonly IService<AnimalDto> _animalsService;

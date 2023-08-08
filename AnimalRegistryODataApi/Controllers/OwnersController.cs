@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.RateLimiting;
 namespace AnimalRegistryODataApi.Controllers;
 
 [EnableRateLimiting("tokenBucket")]
+[ResponseCache(CacheProfileName = "Default")]
 public class OwnersController : ODataController
 {
     private readonly IService<OwnerDto> _ownersService;
@@ -25,6 +26,7 @@ public class OwnersController : ODataController
         Ok(_ownersService.GetAll());
 
     [EnableQuery]
+    [ResponseCache(Duration = 30)]
     public ActionResult<SingleResult<OwnerDto>> Get([FromODataUri] Guid key) =>
         Ok(SingleResult.Create(_ownersService.GetById(key)));
 
