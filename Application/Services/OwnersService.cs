@@ -48,7 +48,6 @@ public class OwnersService : IService<OwnerDto>
     {
         var mappedQuery = _mapper.ProjectTo<OwnerDto>(_session.GetAll());
         _logger.LogInformation("Retrieved a query of owner dtos");
-        _logger.LogInformation("============================FROM THE SERVER===============================");
 
         return mappedQuery;
     }
@@ -57,7 +56,6 @@ public class OwnersService : IService<OwnerDto>
     {
         var mappedQuery = _mapper.ProjectTo<OwnerDto>(_session.GetById(id));
         _logger.LogInformation("Retrieved a query of an owner dto.");
-        _logger.LogInformation("============================FROM THE SERVER===============================");
 
         return mappedQuery;
     }
