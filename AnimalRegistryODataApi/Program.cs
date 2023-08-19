@@ -1,5 +1,7 @@
 using AnimalRegistryODataApi.Configurations;
+using AnimalRegistryODataApi.Middleware;
 using Microsoft.AspNetCore.OData;
+using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,7 +23,7 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-app.UseCustomMiddleware();
+app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
