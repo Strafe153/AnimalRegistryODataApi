@@ -1,7 +1,6 @@
 using AnimalRegistryODataApi.Configurations;
 using AnimalRegistryODataApi.Middleware;
 using Microsoft.AspNetCore.OData;
-using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
 
