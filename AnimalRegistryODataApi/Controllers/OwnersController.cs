@@ -26,7 +26,6 @@ public class OwnersController : ODataController
         Ok(_ownersService.GetAll());
 
     [EnableQuery]
-    [ResponseCache(Duration = 30)]
     public ActionResult<SingleResult<OwnerDto>> Get([FromODataUri] Guid key) =>
         Ok(SingleResult.Create(_ownersService.GetById(key)));
 
