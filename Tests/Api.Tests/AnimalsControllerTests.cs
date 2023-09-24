@@ -12,9 +12,10 @@ namespace Api.Tests;
 [TestClass]
 public class AnimalsControllerTests
 {
-    private readonly AnimalsControllerFixture _fixture;
+    private AnimalsControllerFixture _fixture = new();
 
-    public AnimalsControllerTests()
+    [TestInitialize]
+    public void SetUp()
     {
         _fixture = new AnimalsControllerFixture();
     }

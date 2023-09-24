@@ -11,9 +11,10 @@ namespace Application.Tests;
 [TestClass]
 public class OwnersServiceTests
 {
-    private readonly OwnersServiceFixture _fixture;
+    private OwnersServiceFixture _fixture = new();
 
-    public OwnersServiceTests()
+    [TestInitialize]
+    public void SetUp()
     {
         _fixture = new OwnersServiceFixture();
     }
