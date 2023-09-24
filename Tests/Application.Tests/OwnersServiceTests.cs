@@ -11,7 +11,7 @@ namespace Application.Tests;
 [TestClass]
 public class OwnersServiceTests
 {
-    private OwnersServiceFixture _fixture = new();
+    private OwnersServiceFixture _fixture = default!;
 
     [TestInitialize]
     public void SetUp()

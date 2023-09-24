@@ -11,7 +11,7 @@ namespace Application.Tests;
 [TestClass]
 public class AnimalsServiceTests
 {
-    private AnimalsServiceFixture _fixture = new();
+    private AnimalsServiceFixture _fixture = default!;
 
     [TestInitialize]
     public void SetUp()

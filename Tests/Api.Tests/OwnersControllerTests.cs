@@ -12,7 +12,7 @@ namespace Api.Tests;
 [TestClass]
 public class OwnersControllerTests
 {
-    private OwnersControllerFixture _fixture = new();
+    private OwnersControllerFixture _fixture = default!;
 
     [TestInitialize]
     public void SetUp()
