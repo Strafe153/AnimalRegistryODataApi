@@ -4,11 +4,12 @@ using System.Threading.RateLimiting;
 
 namespace AnimalRegistryODataApi.Configurations;
 
-public static class RateLimitingOptions
+public static class RateLimitingConfiguration
 {
     public static void ConfigureRateLimiting(this IServiceCollection services, IConfiguration configuration)
     {
-        var rateLimitOptions = configuration.Get<RateLimitOptions>()!;
+        var rateLimitOptions = new RateLimitOptions();
+        configuration.GetSection(RateLimitOptions.RateLimitOptionsSectionName).Bind(rateLimitOptions);
 
         services.AddRateLimiter(options =>
         {
