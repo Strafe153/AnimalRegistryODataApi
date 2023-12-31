@@ -1,4 +1,5 @@
 ﻿using Core.DTOs;
+using Core.Shared;
 using FluentValidation;
 using System.Text.RegularExpressions;
 
@@ -43,7 +44,7 @@ public class OwnerValidator : AbstractValidator<OwnerDto>
             .WithMessage("Phone number length must be at least 10 characters long")
             .MaximumLength(20)
             .WithMessage("Phone number length must be less than 20 characters")
-            .Matches(new Regex(@"^[+]*[(]{0,1}[0-9]{1,4}[)]{0,1}[-\s\./0-9]*$"))
+            .Matches(new Regex(ValidatorConstants.PhoneNumberPattern))
             .WithMessage("Incorrect phone number format");
     }
 }

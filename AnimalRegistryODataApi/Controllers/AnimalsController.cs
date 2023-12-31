@@ -1,5 +1,6 @@
 ﻿using Core.DTOs;
 using Core.Interfaces;
+using Core.Shared;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Deltas;
 using Microsoft.AspNetCore.OData.Formatter;
@@ -10,8 +11,8 @@ using Microsoft.AspNetCore.RateLimiting;
 
 namespace AnimalRegistryODataApi.Controllers;
 
-[EnableRateLimiting("tokenBucket")]
-[ResponseCache(CacheProfileName = "Default")]
+[EnableRateLimiting(RateLimitingConstants.TokenBucket)]
+[ResponseCache(CacheProfileName = CacheConstants.Default)]
 public class AnimalsController : ODataController
 {
     private readonly IService<AnimalDto> _animalsService;

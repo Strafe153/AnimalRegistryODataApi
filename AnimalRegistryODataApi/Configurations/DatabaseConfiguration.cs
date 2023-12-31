@@ -1,5 +1,6 @@
 ﻿using Core.Entities;
 using Core.Interfaces;
+using Core.Shared;
 using DataAccess.EntityMappings;
 using DataAccess.MapperSessions;
 using NHibernate.Cfg;
@@ -23,7 +24,7 @@ public static class DatabaseConfiguration
         {
             options.Driver<OracleManagedDataClientDriver>();
             options.Dialect<Oracle12cDialect>();
-            options.ConnectionString = configuration.GetConnectionString("DefaultConnection");
+            options.ConnectionString = configuration.GetConnectionString(ConnectionStringConstants.DefaultConnection);
             options.KeywordsAutoImport = Hbm2DDLKeyWords.AutoQuote;
             options.SchemaAction = SchemaAutoAction.Validate;
             options.LogFormattedSql = true;

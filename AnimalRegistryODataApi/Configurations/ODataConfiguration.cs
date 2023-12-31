@@ -1,4 +1,5 @@
 ﻿using AnimalRegistryODataApi.Configurations.ConfigurationModels;
+using Core.Shared;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData;
 using Microsoft.AspNetCore.OData.Batch;
@@ -12,7 +13,7 @@ public static class ODataConfiguration
         services
             .AddControllers(options =>
             {
-                options.CacheProfiles.Add("Default", new CacheProfile
+                options.CacheProfiles.Add(CacheConstants.Default, new CacheProfile
                 {
                     Duration = 60,
                     VaryByQueryKeys = new[]

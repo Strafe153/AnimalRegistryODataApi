@@ -1,4 +1,5 @@
-﻿using HealthChecks.UI.Client;
+﻿using Core.Shared;
+using HealthChecks.UI.Client;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 
 namespace AnimalRegistryODataApi.Configurations;
@@ -9,7 +10,7 @@ public static class HealthChecksConfiguration
     {
         services
             .AddHealthChecks()
-            .AddOracle(configuration.GetConnectionString("DefaultConnection")!);
+            .AddOracle(configuration.GetConnectionString(ConnectionStringConstants.DefaultConnection)!);
     }
 
     public static void UseHealthChecks(this WebApplication application)
