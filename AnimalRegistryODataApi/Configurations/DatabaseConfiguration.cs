@@ -1,6 +1,6 @@
-﻿using Core.Entities;
+﻿using Core.Constants;
+using Core.Entities;
 using Core.Interfaces;
-using Core.Shared;
 using DataAccess.EntityMappings;
 using DataAccess.MapperSessions;
 using NHibernate.Cfg;

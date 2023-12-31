@@ -1,5 +1,5 @@
 ﻿using AnimalRegistryODataApi.Configurations.ConfigurationModels;
-using Core.Shared;
+using Core.Constants;
 using Microsoft.AspNetCore.RateLimiting;
 
 namespace AnimalRegistryODataApi.Configurations;
