@@ -23,10 +23,12 @@ public class OwnersController : ODataController
     }
 
     [EnableQuery(PageSize = 10)]
+    [ResponseCache(CacheProfileName = CacheConstants.Default)]
     public ActionResult<IQueryable<OwnerDto>> Get() =>
         Ok(_ownersService.GetAll());
 
     [EnableQuery]
+    [ResponseCache(CacheProfileName = CacheConstants.Default)]
     public ActionResult<SingleResult<OwnerDto>> Get([FromODataUri] Guid key) =>
         Ok(SingleResult.Create(_ownersService.GetById(key)));
 

@@ -66,6 +66,7 @@ public class OwnersService : IService<OwnerDto>
 
         if (owner is null)
         {
+            _logger.LogWarning("Failed to retrieve an owner with id {Id}", id);
             throw new NullReferenceException($"Owner with id='{id}' not found.");
         }
 

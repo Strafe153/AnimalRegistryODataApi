@@ -12,7 +12,6 @@ using Microsoft.AspNetCore.RateLimiting;
 namespace AnimalRegistryODataApi.Controllers;
 
 [EnableRateLimiting(RateLimitingConstants.TokenBucket)]
-[ResponseCache(CacheProfileName = CacheConstants.Default)]
 public class AnimalsController : ODataController
 {
     private readonly IService<AnimalDto> _animalsService;
@@ -23,10 +22,12 @@ public class AnimalsController : ODataController
     }
 
     [EnableQuery(PageSize = 10)]
+    [ResponseCache(CacheProfileName = CacheConstants.Default)]
     public ActionResult<IQueryable<AnimalDto>> Get() =>
         Ok(_animalsService.GetAll());
 
     [EnableQuery]
+    [ResponseCache(CacheProfileName = CacheConstants.Default)]
     public ActionResult<SingleResult<AnimalDto>> Get([FromODataUri] Guid key) =>
         Ok(SingleResult.Create(_animalsService.GetById(key)));
 

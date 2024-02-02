@@ -37,8 +37,7 @@ public class AnimalMapperSession : IMapperSession<Animal>
         }
     }
 
-    public async Task DeleteAsync(Animal entity) =>
-        await _session.DeleteAsync(entity);
+    public Task DeleteAsync(Animal entity) => _session.DeleteAsync(entity);
 
     public IQueryable<Animal> GetAll() =>
         _session.Query<Animal>()
@@ -57,9 +56,7 @@ public class AnimalMapperSession : IMapperSession<Animal>
         }
     }
 
-    public async Task SaveAsync(Animal entity) =>
-        await _session.SaveAsync(entity);
+    public Task SaveAsync(Animal entity) => _session.SaveAsync(entity);
 
-    public async Task UpdateAsync(Animal entity) =>
-        await _session.UpdateAsync(entity);
+    public Task UpdateAsync(Animal entity) => _session.UpdateAsync(entity);
 }

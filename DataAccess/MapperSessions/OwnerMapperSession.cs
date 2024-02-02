@@ -37,8 +37,7 @@ public class OwnerMapperSession : IMapperSession<Owner>
         }
     }
 
-    public async Task DeleteAsync(Owner entity) =>
-        await _session.DeleteAsync(entity);
+    public Task DeleteAsync(Owner entity) => _session.DeleteAsync(entity);
 
     public IQueryable<Owner> GetAll() =>
         _session.Query<Owner>()
@@ -57,9 +56,7 @@ public class OwnerMapperSession : IMapperSession<Owner>
         }
     }
 
-    public async Task SaveAsync(Owner entity) =>
-        await _session.SaveAsync(entity);
+    public Task SaveAsync(Owner entity) => _session.SaveAsync(entity);
 
-    public async Task UpdateAsync(Owner entity) =>
-        await _session.UpdateAsync(entity);
+    public Task UpdateAsync(Owner entity) => _session.UpdateAsync(entity);
 }
