@@ -12,7 +12,6 @@ using Microsoft.AspNetCore.RateLimiting;
 namespace AnimalRegistryODataApi.Controllers;
 
 [EnableRateLimiting(RateLimitingConstants.TokenBucket)]
-[ResponseCache(CacheProfileName = CacheConstants.Default)]
 public class OwnersController : ODataController
 {
     private readonly IService<OwnerDto> _ownersService;

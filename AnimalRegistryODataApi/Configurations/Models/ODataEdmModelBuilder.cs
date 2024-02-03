@@ -3,7 +3,7 @@ using Core.Entities;
 using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder;
 
-namespace AnimalRegistryODataApi.Configurations.ConfigurationModels;
+namespace AnimalRegistryODataApi.Configurations.Models;
 
 public static class ODataEdmModelBuilder
 {

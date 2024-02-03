@@ -13,7 +13,7 @@ builder.Services.ConfigureDatabase(builder.Configuration);
 builder.Services.ConfigureHealthChecks(builder.Configuration);
 builder.Services.ConfigureRateLimiting(builder.Configuration);
 
-builder.Services.ConfigureOData();
+builder.Services.ConfigureOData(builder.Configuration);
 builder.Services.AddResponseCaching();
 
 builder.Services.ConfigureCustomServices();
@@ -27,7 +27,6 @@ var app = builder.Build();
 
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();

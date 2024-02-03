@@ -1,4 +1,4 @@
-﻿using AnimalRegistryODataApi.Configurations.ConfigurationModels;
+﻿using AnimalRegistryODataApi.Configurations.Models;
 using Core.Constants;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData;
@@ -8,13 +8,15 @@ namespace AnimalRegistryODataApi.Configurations;
 
 public static class ODataConfiguration
 {
-    public static void ConfigureOData(this IServiceCollection services) =>
+    public static void ConfigureOData(this IServiceCollection services, IConfiguration configuration) =>
         services
             .AddControllers(options =>
             {
+                var cacheOptions = configuration.GetSection(CacheOptions.SectionName).Get<CacheOptions>()!;
+
                 options.CacheProfiles.Add(CacheConstants.Default, new CacheProfile
                 {
-                    Duration = 60,
+                    Duration = cacheOptions.Duration,
                     VaryByQueryKeys = new[]
                     {
                         "*"
