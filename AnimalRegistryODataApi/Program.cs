@@ -1,6 +1,9 @@
 using AnimalRegistryODataApi.Configurations;
 using AnimalRegistryODataApi.Middleware;
+using Application.AutoMapperProfiles;
+using Core.Interfaces;
 using Microsoft.AspNetCore.OData;
+using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,7 +18,7 @@ builder.Services.AddResponseCaching();
 
 builder.Services.ConfigureCustomServices();
 
-builder.Services.ConfigureAutoMapper();
+builder.Services.AddAutoMapper(typeof(OwnerProfile).Assembly);
 builder.Services.ConfigureFluentValidation();
 
 builder.Services.AddSwaggerGen();

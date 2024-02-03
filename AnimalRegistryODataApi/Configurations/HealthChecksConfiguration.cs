@@ -6,18 +6,14 @@ namespace AnimalRegistryODataApi.Configurations;
 
 public static class HealthChecksConfiguration
 {
-    public static void ConfigureHealthChecks(this IServiceCollection services, IConfiguration configuration)
-    {
+    public static void ConfigureHealthChecks(this IServiceCollection services, IConfiguration configuration) =>
         services
             .AddHealthChecks()
             .AddOracle(configuration.GetConnectionString(ConnectionStringConstants.DefaultConnection)!);
-    }
 
-    public static void UseHealthChecks(this WebApplication application)
-    {
+    public static void UseHealthChecks(this WebApplication application) =>
         application.MapHealthChecks("/_health", new HealthCheckOptions
         {
             ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
         });
-    }
 }

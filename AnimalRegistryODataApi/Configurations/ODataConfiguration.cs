@@ -8,8 +8,7 @@ namespace AnimalRegistryODataApi.Configurations;
 
 public static class ODataConfiguration
 {
-    public static void ConfigureOData(this IServiceCollection services)
-    {
+    public static void ConfigureOData(this IServiceCollection services) =>
         services
             .AddControllers(options =>
             {
@@ -17,7 +16,7 @@ public static class ODataConfiguration
                 {
                     Duration = 60,
                     VaryByQueryKeys = new[]
-                    { 
+                    {
                         "*"
                     }
                 });
@@ -30,5 +29,4 @@ public static class ODataConfiguration
                     ODataEdmModelBuilder.BuildV1EdmModel(),
                     new DefaultODataBatchHandler());
             });
-    }
 }
