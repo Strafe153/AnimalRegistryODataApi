@@ -7,18 +7,17 @@ namespace AnimalRegistryODataApi.Configurations;
 
 public static class FluentValidationConfiguration
 {
-    public static void ConfigureFluentValidation(this IServiceCollection services)
-    {
-        services.AddCustomValidators();
+	public static void ConfigureFluentValidation(this IServiceCollection services)
+	{
+		services.AddCustomValidators();
 
-        services
-            .AddFluentValidationAutoValidation()
-            .AddFluentValidationClientsideAdapters();
-    }
+		services
+			.AddFluentValidationAutoValidation()
+			.AddFluentValidationClientsideAdapters();
+	}
 
-    private static void AddCustomValidators(this IServiceCollection services)
-    {
-        services.AddScoped<IValidator<OwnerDto>, OwnerValidator>();
-        services.AddScoped<IValidator<AnimalDto>, AnimalValidator>();
-    }
+	private static void AddCustomValidators(this IServiceCollection services) =>
+		services
+			.AddScoped<IValidator<OwnerDto>, OwnerValidator>()
+			.AddScoped<IValidator<AnimalDto>, AnimalValidator>();
 }
