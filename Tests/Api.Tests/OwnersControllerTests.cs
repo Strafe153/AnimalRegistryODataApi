@@ -1,5 +1,5 @@
 ﻿using Api.Tests.Fixtures;
-using Core.DTOs;
+using Domain.DTOs;
 using FluentAssertions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;

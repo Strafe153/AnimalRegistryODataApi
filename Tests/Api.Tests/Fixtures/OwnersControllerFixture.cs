@@ -2,8 +2,8 @@
 using AutoFixture;
 using AutoFixture.AutoMoq;
 using Bogus;
-using Core.DTOs;
-using Core.Interfaces;
+using Domain.DTOs;
+using Domain.Interfaces;
 using Microsoft.AspNetCore.OData.Deltas;
 using Moq;
 

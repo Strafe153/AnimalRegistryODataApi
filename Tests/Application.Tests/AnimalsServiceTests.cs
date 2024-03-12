@@ -1,7 +1,7 @@
 ﻿using Application.Tests.Fixtures;
-using Core.Entities;
-using Core.Exceptions;
-using Core.Interfaces;
+using Domain.Entities;
+using Domain.Exceptions;
+using Domain.Interfaces;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;

@@ -1,4 +1,4 @@
-﻿using Core.DTOs;
+﻿using Domain.DTOs;
 using FluentValidation;
 
 namespace AnimalRegistryODataApi.Validators;

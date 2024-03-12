@@ -1,5 +1,5 @@
-﻿using Core.Constants;
-using Core.DTOs;
+﻿using Domain.Constants;
+using Domain.DTOs;
 using FluentValidation;
 using System.Text.RegularExpressions;
 

@@ -1,5 +1,5 @@
-﻿using Core.DTOs;
-using Core.Entities;
+﻿using Domain.DTOs;
+using Domain.Entities;
 using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder;
 

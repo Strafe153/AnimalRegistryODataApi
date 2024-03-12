@@ -1,5 +1,5 @@
-﻿using Core.Entities;
-using Core.Interfaces;
+﻿using Domain.Entities;
+using Domain.Interfaces;
 using NHibernate;
 using NHibernate.Linq;
 

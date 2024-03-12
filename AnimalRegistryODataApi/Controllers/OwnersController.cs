@@ -1,6 +1,6 @@
-﻿using Core.Constants;
-using Core.DTOs;
-using Core.Interfaces;
+﻿using Domain.Constants;
+using Domain.DTOs;
+using Domain.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Deltas;
 using Microsoft.AspNetCore.OData.Formatter;

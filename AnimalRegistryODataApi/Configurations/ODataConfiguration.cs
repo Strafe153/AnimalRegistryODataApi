@@ -1,5 +1,5 @@
 ﻿using AnimalRegistryODataApi.Configurations.Models;
-using Core.Constants;
+using Domain.Constants;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData;
 using Microsoft.AspNetCore.OData.Batch;

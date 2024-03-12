@@ -1,7 +1,7 @@
 ﻿using Application.Helpers;
 using Application.Services;
-using Core.DTOs;
-using Core.Interfaces;
+using Domain.DTOs;
+using Domain.Interfaces;
 
 namespace AnimalRegistryODataApi.Configurations;
 

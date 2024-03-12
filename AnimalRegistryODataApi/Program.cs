@@ -1,9 +1,7 @@
 using AnimalRegistryODataApi.Configurations;
 using AnimalRegistryODataApi.Middleware;
 using Application.AutoMapperProfiles;
-using Core.Interfaces;
 using Microsoft.AspNetCore.OData;
-using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -29,8 +27,8 @@ app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
+	app.UseSwagger();
+	app.UseSwaggerUI();
 }
 
 app.UseHealthChecks();

@@ -1,8 +1,8 @@
 ﻿using Application.Helpers;
 using AutoMapper;
-using Core.DTOs;
-using Core.Entities;
-using Core.Interfaces;
+using Domain.DTOs;
+using Domain.Entities;
+using Domain.Interfaces;
 using Microsoft.AspNetCore.OData.Deltas;
 using Microsoft.Extensions.Logging;
 

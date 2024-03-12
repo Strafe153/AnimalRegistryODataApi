@@ -1,4 +1,4 @@
-﻿using Core.Entities;
+﻿using Domain.Entities;
 using NHibernate;
 using NHibernate.Mapping.ByCode;
 using NHibernate.Mapping.ByCode.Conformist;
