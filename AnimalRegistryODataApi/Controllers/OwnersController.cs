@@ -1,6 +1,6 @@
-﻿using Domain.Constants;
-using Domain.DTOs;
-using Domain.Interfaces;
+﻿using Application.DTOs;
+using Application.Services.Interfaces;
+using Domain.Constants;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Deltas;
 using Microsoft.AspNetCore.OData.Formatter;
@@ -14,9 +14,9 @@ namespace AnimalRegistryODataApi.Controllers;
 [EnableRateLimiting(RateLimitingConstants.TokenBucket)]
 public class OwnersController : ODataController
 {
-    private readonly IService<OwnerDto> _ownersService;
+    private readonly IOwnersService _ownersService;
 
-    public OwnersController(IService<OwnerDto> ownersService)
+    public OwnersController(IOwnersService ownersService)
     {
         _ownersService = ownersService;
     }

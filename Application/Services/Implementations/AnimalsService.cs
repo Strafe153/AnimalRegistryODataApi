@@ -1,23 +1,24 @@
-﻿using Application.Helpers;
+﻿using Application.DTOs;
+using Application.Helpers.Interfaces;
+using Application.Services.Interfaces;
 using AutoMapper;
-using Domain.DTOs;
 using Domain.Entities;
 using Domain.Interfaces;
 using Microsoft.AspNetCore.OData.Deltas;
 using Microsoft.Extensions.Logging;
 
-namespace Application.Services;
+namespace Application.Services.Implementations;
 
-public class AnimalsService : IService<AnimalDto>
+public class AnimalsService : IAnimalsService
 {
 	private readonly IMapperSession<Animal> _session;
-	private readonly TransactionRunner _transactionRunner;
+	private readonly ITransactionRunner _transactionRunner;
 	private readonly IMapper _mapper;
 	private readonly ILogger<AnimalsService> _logger;
 
 	public AnimalsService(
 		IMapperSession<Animal> session,
-		TransactionRunner transactionRunner,
+		ITransactionRunner transactionRunner,
 		IMapper mapper,
 		ILogger<AnimalsService> logger)
 	{

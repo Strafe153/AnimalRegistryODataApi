@@ -14,7 +14,7 @@ builder.Services.ConfigureRateLimiting(builder.Configuration);
 builder.Services.ConfigureOData(builder.Configuration);
 builder.Services.AddResponseCaching();
 
-builder.Services.ConfigureCustomServices();
+builder.Services.ConfigureServices();
 
 builder.Services.AddAutoMapper(typeof(OwnerProfile).Assembly);
 builder.Services.ConfigureFluentValidation();

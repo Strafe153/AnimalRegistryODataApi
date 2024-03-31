@@ -1,15 +1,15 @@
-﻿using AutoMapper;
-using Domain.DTOs;
+﻿using Application.DTOs;
+using AutoMapper;
 using Domain.Entities;
 
 namespace Application.AutoMapperProfiles;
 
 public class OwnerProfile : Profile
 {
-    public OwnerProfile()
-    {
-        CreateMap<Owner, OwnerDto>()
-            .ReverseMap()
-            .ForMember(o => o.Id, opt => opt.Ignore());
-    }
+	public OwnerProfile()
+	{
+		CreateMap<Owner, OwnerDto>()
+			.ReverseMap()
+			.ForMember(o => o.Id, opt => opt.Ignore());
+	}
 }

@@ -1,5 +1,5 @@
 ﻿using AnimalRegistryODataApi.Validators;
-using Domain.DTOs;
+using Application.DTOs;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 
