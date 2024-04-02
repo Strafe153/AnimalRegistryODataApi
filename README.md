@@ -12,7 +12,6 @@
 * `AspNetCore.HealthChecks.Oracle` for Oracle health check
 * `AspNetCore.HealthChecks.UI.Client` for detailed health checks information
 * `Bogus` for fake data generation
-* `FluentAssertions` for assertions
 * `FluentValidation.AspNetCore` for DTO validation
 * `Microsoft.AspNetCore.Mvc` for ProblemDetails
 * `Microsoft.AspNetCore.OData` for OData capabilities
