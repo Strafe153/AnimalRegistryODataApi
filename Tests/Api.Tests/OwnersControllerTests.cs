@@ -1,6 +1,5 @@
 ﻿using Api.Tests.Fixtures;
 using Application.DTOs;
-using FluentAssertions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Results;
@@ -30,14 +29,14 @@ public class OwnersControllerTests
 
 		// Act
 		var result = _fixture.OwnersController.Get();
-		var objectResult = result.Result.As<OkObjectResult>();
-		var queryResult = objectResult.Value.As<IQueryable<OwnerDto>>();
+		var objectResult = result.Result as OkObjectResult;
+		var queryResult = objectResult?.Value as IQueryable<OwnerDto>;
 
 		// Assert
-		result.Should().BeOfType<ActionResult<IQueryable<OwnerDto>>>();
-		objectResult.StatusCode.Should().Be(StatusCodes.Status200OK);
-		queryResult.Should().NotBeNull();
-		queryResult.Count().Should().Be(_fixture.OwnerDtosCount);
+		Assert.IsInstanceOfType<ActionResult<IQueryable<OwnerDto>>>(result);
+		Assert.AreEqual(StatusCodes.Status200OK, objectResult?.StatusCode);
+		Assert.IsNotNull(queryResult);
+		Assert.AreEqual(_fixture.OwnerDtosCount, queryResult.Count());
 	}
 
 	[TestMethod]
@@ -50,13 +49,14 @@ public class OwnersControllerTests
 
 		// Act
 		var result = _fixture.OwnersController.Get(_fixture.Id);
-		var objectResult = result.Result.As<OkObjectResult>();
-		var singleResult = objectResult.Value.As<SingleResult<OwnerDto>>();
+		var objectResult = result.Result as OkObjectResult;
+		var singleResult = objectResult?.Value as SingleResult<OwnerDto>;
 
 		// Assert
-		result.Should().NotBeNull().And.BeOfType<ActionResult<SingleResult<OwnerDto>>>();
-		objectResult.StatusCode.Should().Be(StatusCodes.Status200OK);
-		singleResult.Should().NotBeNull();
+		Assert.IsNotNull(result);
+		Assert.IsInstanceOfType<ActionResult<SingleResult<OwnerDto>>>(result);
+		Assert.AreEqual(StatusCodes.Status200OK, objectResult?.StatusCode);
+		Assert.IsNotNull(singleResult);
 	}
 
 	[TestMethod]
@@ -69,13 +69,14 @@ public class OwnersControllerTests
 
 		// Act
 		var result = await _fixture.OwnersController.Post(_fixture.OwnerDto);
-		var objectResult = result.Result.As<CreatedAtActionResult>();
-		var ownerDto = objectResult.Value.As<OwnerDto>();
+		var objectResult = result.Result as CreatedAtActionResult;
+		var ownerDto = objectResult?.Value as OwnerDto;
 
 		// Assert
-		result.Should().NotBeNull().And.BeOfType<ActionResult<OwnerDto>>();
-		objectResult.StatusCode.Should().Be(StatusCodes.Status201Created);
-		ownerDto.Should().NotBeNull();
+		Assert.IsNotNull(result);
+		Assert.IsInstanceOfType<ActionResult<OwnerDto>>(result);
+		Assert.AreEqual(StatusCodes.Status201Created, objectResult?.StatusCode);
+		Assert.IsNotNull(ownerDto);
 	}
 
 	[TestMethod]
@@ -83,11 +84,12 @@ public class OwnersControllerTests
 	{
 		// Act
 		var result = await _fixture.OwnersController.Put(_fixture.Id, _fixture.OwnerDto);
-		var objectResult = result.As<NoContentResult>();
+		var objectResult = result as NoContentResult;
 
 		// Assert
-		result.Should().NotBeNull().And.BeOfType<NoContentResult>();
-		objectResult.StatusCode.Should().Be(StatusCodes.Status204NoContent);
+		Assert.IsNotNull(result);
+		Assert.IsInstanceOfType<NoContentResult>(result);
+		Assert.AreEqual(StatusCodes.Status204NoContent, objectResult?.StatusCode);
 	}
 
 	[TestMethod]
@@ -95,11 +97,12 @@ public class OwnersControllerTests
 	{
 		// Act
 		var result = await _fixture.OwnersController.Patch(_fixture.Id, _fixture.OwnerDtoDelta);
-		var objectResult = result.As<NoContentResult>();
+		var objectResult = result as NoContentResult;
 
 		// Assert
-		result.Should().NotBeNull().And.BeOfType<NoContentResult>();
-		objectResult.StatusCode.Should().Be(StatusCodes.Status204NoContent);
+		Assert.IsNotNull(result);
+		Assert.IsInstanceOfType<NoContentResult>(result);
+		Assert.AreEqual(StatusCodes.Status204NoContent, objectResult?.StatusCode);
 	}
 
 	[TestMethod]
@@ -107,10 +110,11 @@ public class OwnersControllerTests
 	{
 		// Act
 		var result = await _fixture.OwnersController.Delete(_fixture.Id);
-		var objectResult = result.As<NoContentResult>();
+		var objectResult = result as NoContentResult;
 
 		// Assert
-		result.Should().NotBeNull().And.BeOfType<NoContentResult>();
-		objectResult.StatusCode.Should().Be(StatusCodes.Status204NoContent);
+		Assert.IsNotNull(result);
+		Assert.IsInstanceOfType<NoContentResult>(result);
+		Assert.AreEqual(StatusCodes.Status204NoContent, objectResult?.StatusCode);
 	}
 }
