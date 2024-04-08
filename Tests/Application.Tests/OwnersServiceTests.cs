@@ -59,6 +59,7 @@ public class OwnersServiceTests
 	}
 
 	[TestMethod]
+	[ExpectedException(typeof(OperationFailedException))]
 	public async Task CreateAsync_Should_ThrowOperationFailedException_WhenOwnerDtoIsInvalid()
 	{
 		// Arrange
@@ -74,10 +75,7 @@ public class OwnersServiceTests
 			.Throws(new OperationFailedException(_fixture.Id.ToString()));
 
 		// Act
-		Task result() => _fixture.OwnersService.CreateAsync(_fixture.OwnerDto);
-
-		// Assert
-		await Assert.ThrowsExceptionAsync<OperationFailedException>(result);
+		await _fixture.OwnersService.CreateAsync(_fixture.OwnerDto);
 	}
 
 	[TestMethod]
@@ -121,6 +119,7 @@ public class OwnersServiceTests
 	}
 
 	[TestMethod]
+	[ExpectedException(typeof(NullReferenceException))]
 	public async Task UpdateAsync_Should_ThrowNullReferenceException_WhenOwnerDoesNotExist()
 	{
 		// Arrange
@@ -129,13 +128,11 @@ public class OwnersServiceTests
 			.Returns(_fixture.GetByIdEmptyOwnersQuery);
 
 		// Act
-		Task result() => _fixture.OwnersService.UpdateAsync(_fixture.Id, _fixture.OwnerDto);
-
-		// Assert
-		await Assert.ThrowsExceptionAsync<NullReferenceException>(result);
+		await _fixture.OwnersService.UpdateAsync(_fixture.Id, _fixture.OwnerDto);
 	}
 
 	[TestMethod]
+	[ExpectedException(typeof(NullReferenceException))]
 	public async Task UpdateAsync_Should_ThrowNullReferenceException_WithDeltaWhenOwnerDoesNotExist()
 	{
 		// Arrange
@@ -144,13 +141,11 @@ public class OwnersServiceTests
 			.Returns(_fixture.GetByIdEmptyOwnersQuery);
 
 		// Act
-		Task result() => _fixture.OwnersService.UpdateAsync(_fixture.Id, _fixture.OwnerDtoDelta);
-
-		// Assert
-		await Assert.ThrowsExceptionAsync<NullReferenceException>(result);
+		await _fixture.OwnersService.UpdateAsync(_fixture.Id, _fixture.OwnerDtoDelta);
 	}
 
 	[TestMethod]
+	[ExpectedException(typeof(OperationFailedException))]
 	public async Task UpdateAsync_Should_ThrowOperationFailedException_WhenOwnerDtoIsInvalid()
 	{
 		// Arrange
@@ -166,13 +161,11 @@ public class OwnersServiceTests
 			.Throws(new OperationFailedException(_fixture.Id.ToString()));
 
 		// Act
-		Task result() => _fixture.OwnersService.UpdateAsync(_fixture.Id, _fixture.OwnerDto);
-
-		// Assert
-		await Assert.ThrowsExceptionAsync<OperationFailedException>(result);
+		await _fixture.OwnersService.UpdateAsync(_fixture.Id, _fixture.OwnerDto);
 	}
 
 	[TestMethod]
+	[ExpectedException(typeof(OperationFailedException))]
 	public async Task UpdateAsync_Should_ThrowOperationFailedException_WhenOwnerDeltaIsInvalid()
 	{
 		// Arrange
@@ -188,10 +181,7 @@ public class OwnersServiceTests
 			.Throws(new OperationFailedException(_fixture.Id.ToString()));
 
 		// Act
-		Task result() => _fixture.OwnersService.UpdateAsync(_fixture.Id, _fixture.OwnerDtoDelta);
-
-		// Assert
-		await Assert.ThrowsExceptionAsync<OperationFailedException>(result);
+		await _fixture.OwnersService.UpdateAsync(_fixture.Id, _fixture.OwnerDtoDelta);
 	}
 
 	[TestMethod]
@@ -215,6 +205,7 @@ public class OwnersServiceTests
 	}
 
 	[TestMethod]
+	[ExpectedException(typeof(OperationFailedException))]
 	public async Task DeleteAsync_Should_ThrowOperationFailedException_WhenOperationFails()
 	{
 		// Arrange
@@ -230,13 +221,11 @@ public class OwnersServiceTests
 			.Throws(new OperationFailedException(_fixture.Id.ToString()));
 
 		// Act
-		Task result() => _fixture.OwnersService.DeleteAsync(_fixture.Id);
-
-		// Assert
-		await Assert.ThrowsExceptionAsync<OperationFailedException>(result);
+		await _fixture.OwnersService.DeleteAsync(_fixture.Id);
 	}
 
 	[TestMethod]
+	[ExpectedException(typeof(NullReferenceException))]
 	public async Task DeleteAsync_Should_ThrowNullReferenceException_WhenOwnerDoesNotExist()
 	{
 		// Arrange
@@ -245,9 +234,6 @@ public class OwnersServiceTests
 			.Returns(_fixture.GetByIdEmptyOwnersQuery);
 
 		// Act
-		Task result() => _fixture.OwnersService.DeleteAsync(_fixture.Id);
-
-		// Assert
-		await Assert.ThrowsExceptionAsync<NullReferenceException>(result);
+		await _fixture.OwnersService.DeleteAsync(_fixture.Id);
 	}
 }

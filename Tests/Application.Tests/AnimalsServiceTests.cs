@@ -60,6 +60,7 @@ public class AnimalsServiceTests
 	}
 
 	[TestMethod]
+	[ExpectedException(typeof(OperationFailedException))]
 	public async Task CreateAsync_Should_ThrowOperationFailedException_WhenAnimalDtoIsInvalid()
 	{
 		// Arrange
@@ -75,10 +76,7 @@ public class AnimalsServiceTests
 			.Throws(new OperationFailedException(_fixture.Id.ToString()));
 
 		// Act
-		Task result() => _fixture.AnimalsService.CreateAsync(_fixture.AnimalDto);
-
-		// Assert
-		await Assert.ThrowsExceptionAsync<OperationFailedException>(result);
+		await _fixture.AnimalsService.CreateAsync(_fixture.AnimalDto);
 	}
 
 	[TestMethod]
@@ -122,6 +120,7 @@ public class AnimalsServiceTests
 	}
 
 	[TestMethod]
+	[ExpectedException(typeof(NullReferenceException))]
 	public async Task UpdateAsync_Should_ThrowNullReferenceException_WhenAnimalDoesNotExist()
 	{
 		// Arrange
@@ -130,13 +129,11 @@ public class AnimalsServiceTests
 			.Returns(_fixture.GetByIdEmptyAnimalsQuery);
 
 		// Act
-		Task result() => _fixture.AnimalsService.UpdateAsync(_fixture.Id, _fixture.AnimalDto);
-
-		// Assert
-		await Assert.ThrowsExceptionAsync<NullReferenceException>(result);
+		await _fixture.AnimalsService.UpdateAsync(_fixture.Id, _fixture.AnimalDto);
 	}
 
 	[TestMethod]
+	[ExpectedException(typeof(NullReferenceException))]
 	public async Task UpdateAsync_Should_ThrowNullReferenceException_WithDeltaWhenAnimalDoesNotExist()
 	{
 		// Arrange
@@ -145,13 +142,11 @@ public class AnimalsServiceTests
 			.Returns(_fixture.GetByIdEmptyAnimalsQuery);
 
 		// Act
-		Task result() => _fixture.AnimalsService.UpdateAsync(_fixture.Id, _fixture.AnimalDtoDelta);
-
-		// Assert
-		await Assert.ThrowsExceptionAsync<NullReferenceException>(result);
+		await _fixture.AnimalsService.UpdateAsync(_fixture.Id, _fixture.AnimalDtoDelta);
 	}
 
 	[TestMethod]
+	[ExpectedException(typeof(OperationFailedException))]
 	public async Task UpdateAsync_Should_ThrowOperationFailedException_WhenAnimalDtoIsInvalid()
 	{
 		// Arrange
@@ -167,13 +162,11 @@ public class AnimalsServiceTests
 			.Throws(new OperationFailedException(_fixture.Id.ToString()));
 
 		// Act
-		Task result() => _fixture.AnimalsService.UpdateAsync(_fixture.Id, _fixture.AnimalDto);
-
-		// Assert
-		await Assert.ThrowsExceptionAsync<OperationFailedException>(result);
+		await _fixture.AnimalsService.UpdateAsync(_fixture.Id, _fixture.AnimalDto);
 	}
 
 	[TestMethod]
+	[ExpectedException(typeof(OperationFailedException))]
 	public async Task UpdateAsync_Should_ThrowOperationFailedException_WhenAnimalDeltaIsInvalid()
 	{
 		// Arrange
@@ -189,10 +182,7 @@ public class AnimalsServiceTests
 			.Throws(new OperationFailedException(_fixture.Id.ToString()));
 
 		// Act
-		Task result() => _fixture.AnimalsService.UpdateAsync(_fixture.Id, _fixture.AnimalDtoDelta);
-
-		// Assert
-		await Assert.ThrowsExceptionAsync<OperationFailedException>(result);
+		await _fixture.AnimalsService.UpdateAsync(_fixture.Id, _fixture.AnimalDtoDelta);
 	}
 
 	[TestMethod]
@@ -216,6 +206,7 @@ public class AnimalsServiceTests
 	}
 
 	[TestMethod]
+	[ExpectedException(typeof(OperationFailedException))]
 	public async Task DeleteAsync_Should_ThrowOperationFailedException_WhenOperationFails()
 	{
 		// Arrange
@@ -231,13 +222,11 @@ public class AnimalsServiceTests
 			.Throws(new OperationFailedException(_fixture.Id.ToString()));
 
 		// Act
-		Task result() => _fixture.AnimalsService.DeleteAsync(_fixture.Id);
-
-		// Assert
-		await Assert.ThrowsExceptionAsync<OperationFailedException>(result);
+		await _fixture.AnimalsService.DeleteAsync(_fixture.Id);
 	}
 
 	[TestMethod]
+	[ExpectedException(typeof(NullReferenceException))]
 	public async Task DeleteAsync_Should_ThrowNullReferenceException_WhenAnimalDoesNotExist()
 	{
 		// Arrange
@@ -246,9 +235,6 @@ public class AnimalsServiceTests
 			.Returns(_fixture.GetByIdEmptyAnimalsQuery);
 
 		// Act
-		Task result() => _fixture.AnimalsService.DeleteAsync(_fixture.Id);
-
-		// Assert
-		await Assert.ThrowsExceptionAsync<NullReferenceException>(result);
+		await _fixture.AnimalsService.DeleteAsync(_fixture.Id);
 	}
 }
