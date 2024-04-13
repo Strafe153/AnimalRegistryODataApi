@@ -26,7 +26,7 @@ public static class DatabaseConfiguration
 			options.Dialect<Oracle12cDialect>();
 			options.ConnectionString = configuration.GetConnectionString(ConnectionStringConstants.DefaultConnection);
 			options.KeywordsAutoImport = Hbm2DDLKeyWords.AutoQuote;
-			options.SchemaAction = SchemaAutoAction.Validate;
+			options.SchemaAction = SchemaAutoAction.Update;
 			options.LogFormattedSql = true;
 			options.LogSqlInConsole = true;
 		});

@@ -15,6 +15,7 @@ builder.Services.ConfigureOData(builder.Configuration);
 builder.Services.AddResponseCaching();
 
 builder.Services.ConfigureServices();
+builder.Services.ConfigureMiddleware();
 
 builder.Services.AddAutoMapper(typeof(OwnerProfile).Assembly);
 builder.Services.ConfigureFluentValidation();

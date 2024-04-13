@@ -3,24 +3,18 @@ using Domain.Shared;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using System.Net;
+using System.Net.Mime;
 using ValidationException = FluentValidation.ValidationException;
 
 namespace AnimalRegistryODataApi.Middleware;
 
-public class ExceptionHandlingMiddleware
+public class ExceptionHandlingMiddleware : IMiddleware
 {
-	private readonly RequestDelegate _next;
-
-	public ExceptionHandlingMiddleware(RequestDelegate next)
-	{
-		_next = next;
-	}
-
-	public async Task InvokeAsync(HttpContext context)
+	public async Task InvokeAsync(HttpContext context, RequestDelegate next)
 	{
 		try
 		{
-			await _next(context);
+			await next(context);
 		}
 		catch (Exception ex)
 		{
@@ -33,7 +27,7 @@ public class ExceptionHandlingMiddleware
 		var statusCode = GetHttpStatusCode(exception);
 		var statusCodeAsInt = (int)statusCode;
 
-		context.Response.ContentType = "application/json";
+		context.Response.ContentType = MediaTypeNames.Application.Json;
 		context.Response.StatusCode = statusCodeAsInt;
 
 		var problemDetails = GetProblemDetails(context, exception, statusCode, statusCodeAsInt);
@@ -49,44 +43,36 @@ public class ExceptionHandlingMiddleware
 		int statusCodeAsInt)
 	{
 		var rfcType = GetRFCType(statusCode);
+
 		var errors = exception is ValidationException validationException
-		   ? validationException
-			   .Errors
-			   .GroupBy(v => v.PropertyName)
-			   .Select(g => new Error
-			   {
-				   Property = g.Key,
-				   ErrorMessages = g.Select(v => v.ErrorMessage).Distinct()
-			   })
-		   : null;
+			? validationException
+				.Errors
+				.GroupBy(v => v.PropertyName)
+				.Select(g =>
+					new Error
+					{
+						 Property = g.Key,
+						ErrorMessages = g.Select(v => v.ErrorMessage).Distinct()
+					})
+			: null;
 
-		if (errors is null)
+		ProblemDetails problemDetails = new()
 		{
-			ProblemDetails problemDetails = new()
-			{
-				Type = rfcType,
-				Title = exception.Message,
-				Status = statusCodeAsInt,
-				Instance = context.Request.Path,
-				Detail = exception.Message
-			};
+			Type = rfcType,
+			Title = exception.Message,
+			Status = statusCodeAsInt,
+			Instance = context.Request.Path,
+			Detail = exception.Message
+		};
 
-			return problemDetails;
-		}
-		else
+		if (errors is not null
+			&& problemDetails is FluentValidationProblemDetails fluentValidationProblemDetails)
 		{
-			FluentValidationProblemDetails problemDetails = new()
-			{
-				Type = rfcType,
-				Title = exception.Message,
-				Status = statusCodeAsInt,
-				Instance = context.Request.Path,
-				Detail = exception.Message,
-				ValidationErrors = errors
-			};
-
-			return problemDetails;
+			fluentValidationProblemDetails.ValidationErrors = errors;
+			return fluentValidationProblemDetails;
 		}
+
+		return problemDetails;
 	}
 
 	private static HttpStatusCode GetHttpStatusCode(Exception exception) =>
