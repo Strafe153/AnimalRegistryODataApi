@@ -1,6 +1,5 @@
 ﻿using Domain.Exceptions;
 using Domain.Shared;
-using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using System.Net;
 using System.Net.Mime;
@@ -31,7 +30,13 @@ public class ExceptionHandlingMiddleware : IMiddleware
 		context.Response.StatusCode = statusCodeAsInt;
 
 		var problemDetails = GetProblemDetails(context, exception, statusCode, statusCodeAsInt);
-		var json = JsonConvert.SerializeObject(problemDetails);
+
+		var json = JsonConvert.SerializeObject(
+			problemDetails,
+			new JsonSerializerSettings
+			{
+				NullValueHandling = NullValueHandling.Ignore
+			});
 
 		return context.Response.WriteAsync(json);
 	}
@@ -56,23 +61,13 @@ public class ExceptionHandlingMiddleware : IMiddleware
 					})
 			: null;
 
-		ProblemDetails problemDetails = new()
-		{
-			Type = rfcType,
-			Title = exception.Message,
-			Status = statusCodeAsInt,
-			Instance = context.Request.Path,
-			Detail = exception.Message
-		};
-
-		if (errors is not null
-			&& problemDetails is FluentValidationProblemDetails fluentValidationProblemDetails)
-		{
-			fluentValidationProblemDetails.ValidationErrors = errors;
-			return fluentValidationProblemDetails;
-		}
-
-		return problemDetails;
+		return new(
+			rfcType,
+			exception.Message,
+			statusCodeAsInt,
+			context.Request.Path,
+			exception.Message,
+			errors);
 	}
 
 	private static HttpStatusCode GetHttpStatusCode(Exception exception) =>
