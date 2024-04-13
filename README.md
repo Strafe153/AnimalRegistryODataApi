@@ -13,7 +13,6 @@
 * `AspNetCore.HealthChecks.UI.Client` for detailed health checks information
 * `Bogus` for fake data generation
 * `FluentValidation.AspNetCore` for DTO validation
-* `Microsoft.AspNetCore.Mvc` for ProblemDetails
 * `Microsoft.AspNetCore.OData` for OData capabilities
 * `Microsoft.AspNetCore.OpenApi` for Open API support
 * `Microsoft.Extensions.Logging.Log4Net.AspNetCore` for log4net
