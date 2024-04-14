@@ -34,11 +34,11 @@ if (app.Environment.IsDevelopment())
 
 app.UseHealthChecks();
 
-app.UseRateLimiter();
-
 app.UseODataBatching();
 app.UseODataRouteDebug();
 app.UseRouting();
+
+app.UseRateLimiter();
 
 app.UseResponseCaching();
 
