@@ -2,6 +2,7 @@
 using Application.Helpers.Interfaces;
 using Application.Services.Interfaces;
 using AutoMapper;
+using DataAccess.Extensions;
 using Domain.Entities;
 using Domain.Interfaces;
 using Microsoft.AspNetCore.OData.Deltas;
@@ -33,7 +34,7 @@ public class OwnersService : IOwnersService
 		var owner = _mapper.Map<Owner>(createDto);
 
 		await _transactionRunner.RunInTransactionAsync(
-			async () => await _session.SaveAsync(owner),
+			() => _session.SaveAsync(owner),
 			_session,
 			$"Failed to create an owner.");
 
@@ -63,16 +64,10 @@ public class OwnersService : IOwnersService
 
 	public async Task DeleteAsync(Guid id)
 	{
-		var owner = _session.GetById(id).FirstOrDefault();
-
-		if (owner is null)
-		{
-			_logger.LogWarning("Failed to retrieve an owner with id {Id}", id);
-			throw new NullReferenceException($"Owner with id='{id}' not found.");
-		}
+		var owner = _session.GetByIdOrThrowAsync(id, _logger);
 
 		await _transactionRunner.RunInTransactionAsync(
-			async () => await _session.DeleteAsync(owner),
+			() => _session.DeleteAsync(owner),
 			_session,
 			$"Failed to delete owner with id='{id}'.");
 
@@ -81,18 +76,11 @@ public class OwnersService : IOwnersService
 
 	public async Task UpdateAsync(Guid id, OwnerDto dto)
 	{
-		var owner = _session.GetById(id).FirstOrDefault();
-
-		if (owner is null)
-		{
-			_logger.LogWarning("Failed to retrieve an owner with id {Id}", id);
-			throw new NullReferenceException($"Owner with id='{id}' not found.");
-		}
-
+		var owner = _session.GetByIdOrThrowAsync(id, _logger);
 		_mapper.Map(dto, owner);
 
 		await _transactionRunner.RunInTransactionAsync(
-			async () => await _session.UpdateAsync(owner),
+			() => _session.UpdateAsync(owner),
 			_session,
 			$"Failed to update owner with id='{id}'.");
 
@@ -101,21 +89,14 @@ public class OwnersService : IOwnersService
 
 	public async Task UpdateAsync(Guid id, Delta<OwnerDto> delta)
 	{
-		var owner = _session.GetById(id).FirstOrDefault();
-
-		if (owner is null)
-		{
-			_logger.LogWarning("Failed to retrieve an owner with id {Id}", id);
-			throw new NullReferenceException($"Owner with id='{id}' not found.");
-		}
-
+		var owner = _session.GetByIdOrThrowAsync(id, _logger);
 		var dto = _mapper.Map<OwnerDto>(owner);
 
 		delta.Patch(dto);
 		_mapper.Map(dto, owner);
 
 		await _transactionRunner.RunInTransactionAsync(
-			async () => await _session.UpdateAsync(owner),
+			() => _session.UpdateAsync(owner),
 			_session,
 			$"Failed to update owner with id='{id}'.");
 

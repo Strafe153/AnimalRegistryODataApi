@@ -20,7 +20,7 @@ builder.Services.ConfigureMiddleware();
 builder.Services.AddAutoMapper(typeof(OwnerProfile).Assembly);
 builder.Services.ConfigureFluentValidation();
 
-builder.Services.AddSwaggerGen();
+builder.Services.ConfigureSwagger();
 
 var app = builder.Build();
 

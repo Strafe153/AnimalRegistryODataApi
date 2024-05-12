@@ -22,7 +22,7 @@ public class AnimalsServiceTests
 	public void GetAll_Should_ReturnIQueryableOfAnimalDto()
 	{
 		// Arrange
-		_fixture.Session
+		_fixture.AnimalSession
 			.Setup(s => s.GetAll())
 			.Returns(_fixture.GetAllAnimalsQuery);
 
@@ -38,7 +38,7 @@ public class AnimalsServiceTests
 	public void GetById_Should_ReturnIQueryableOfAnimalDto()
 	{
 		// Arrange
-		_fixture.Session
+		_fixture.AnimalSession
 			.Setup(s => s.GetById(It.IsAny<Guid>()))
 			.Returns(_fixture.GetByIdAnimalsQuery);
 
@@ -52,6 +52,11 @@ public class AnimalsServiceTests
 	[TestMethod]
 	public async Task CreateAsync_Should_ReturnAnimalDto_WhenAnimalDtoIsValid()
 	{
+		// Arrange
+		_fixture.OwnerSession
+			.Setup(c => c.GetById(It.IsAny<Guid>()))
+			.Returns(_fixture.GetByIdOwnersQuery);
+
 		// Act
 		var result = await _fixture.AnimalsService.CreateAsync(_fixture.AnimalDto);
 
@@ -60,13 +65,30 @@ public class AnimalsServiceTests
 	}
 
 	[TestMethod]
+	[ExpectedException(typeof(NullReferenceException))]
+	public async Task CreateAsync_Should_ThrowNullReferenceException_WhenOwnerDoesNotExist()
+	{
+		// Arrange
+		_fixture.OwnerSession
+			.Setup(c => c.GetById(It.IsAny<Guid>()))
+			.Returns(_fixture.GetByIdEmptyOwnersQuery);
+
+		// Act
+		await _fixture.AnimalsService.CreateAsync(_fixture.AnimalDto);
+	}
+
+	[TestMethod]
 	[ExpectedException(typeof(OperationFailedException))]
 	public async Task CreateAsync_Should_ThrowOperationFailedException_WhenAnimalDtoIsInvalid()
 	{
 		// Arrange
-		_fixture.Session
+		_fixture.AnimalSession
 			.Setup(c => c.GetById(It.IsAny<Guid>()))
 			.Returns(_fixture.GetByIdAnimalsQuery);
+
+		_fixture.OwnerSession
+			.Setup(c => c.GetById(It.IsAny<Guid>()))
+			.Returns(_fixture.GetByIdOwnersQuery);
 
 		_fixture.TransactionRunner
 			.Setup(r => r.RunInTransactionAsync(
@@ -83,9 +105,13 @@ public class AnimalsServiceTests
 	public async Task UpdateAsync_Should_ReturnTask_WhenAnimalDtoIsValid()
 	{
 		// Arrange
-		_fixture.Session
+		_fixture.AnimalSession
 			.Setup(c => c.GetById(It.IsAny<Guid>()))
 			.Returns(_fixture.GetByIdAnimalsQuery);
+
+		_fixture.OwnerSession
+			.Setup(c => c.GetById(It.IsAny<Guid>()))
+			.Returns(_fixture.GetByIdOwnersQuery);
 
 		try
 		{
@@ -103,9 +129,13 @@ public class AnimalsServiceTests
 	public async Task UpdateAsync_Should_ReturnTask_WhenAnimalDeltaIsValid()
 	{
 		// Arrange
-		_fixture.Session
+		_fixture.AnimalSession
 			.Setup(c => c.GetById(It.IsAny<Guid>()))
 			.Returns(_fixture.GetByIdAnimalsQuery);
+
+		_fixture.OwnerSession
+			.Setup(c => c.GetById(It.IsAny<Guid>()))
+			.Returns(_fixture.GetByIdOwnersQuery);
 
 		try
 		{
@@ -124,9 +154,22 @@ public class AnimalsServiceTests
 	public async Task UpdateAsync_Should_ThrowNullReferenceException_WhenAnimalDoesNotExist()
 	{
 		// Arrange
-		_fixture.Session
+		_fixture.AnimalSession
 			.Setup(s => s.GetById(It.IsAny<Guid>()))
 			.Returns(_fixture.GetByIdEmptyAnimalsQuery);
+
+		// Act
+		await _fixture.AnimalsService.UpdateAsync(_fixture.Id, _fixture.AnimalDto);
+	}
+
+	[TestMethod]
+	[ExpectedException(typeof(NullReferenceException))]
+	public async Task UpdateAsync_Should_ThrowNullReferenceException_WhenOwnerDoesNotExist()
+	{
+		// Arrange
+		_fixture.OwnerSession
+			.Setup(c => c.GetById(It.IsAny<Guid>()))
+			.Returns(_fixture.GetByIdEmptyOwnersQuery);
 
 		// Act
 		await _fixture.AnimalsService.UpdateAsync(_fixture.Id, _fixture.AnimalDto);
@@ -137,9 +180,26 @@ public class AnimalsServiceTests
 	public async Task UpdateAsync_Should_ThrowNullReferenceException_WithDeltaWhenAnimalDoesNotExist()
 	{
 		// Arrange
-		_fixture.Session
+		_fixture.AnimalSession
 			.Setup(s => s.GetById(It.IsAny<Guid>()))
 			.Returns(_fixture.GetByIdEmptyAnimalsQuery);
+
+		// Act
+		await _fixture.AnimalsService.UpdateAsync(_fixture.Id, _fixture.AnimalDtoDelta);
+	}
+
+	[TestMethod]
+	[ExpectedException(typeof(NullReferenceException))]
+	public async Task UpdateAsync_Should_ThrowNullReferenceException_WithDeltaWhenOwnerDoesNotExist()
+	{
+		// Arrange
+		_fixture.AnimalSession
+			.Setup(s => s.GetById(It.IsAny<Guid>()))
+			.Returns(_fixture.GetByIdEmptyAnimalsQuery);
+
+		_fixture.OwnerSession
+			.Setup(c => c.GetById(It.IsAny<Guid>()))
+			.Returns(_fixture.GetByIdEmptyOwnersQuery);
 
 		// Act
 		await _fixture.AnimalsService.UpdateAsync(_fixture.Id, _fixture.AnimalDtoDelta);
@@ -150,9 +210,13 @@ public class AnimalsServiceTests
 	public async Task UpdateAsync_Should_ThrowOperationFailedException_WhenAnimalDtoIsInvalid()
 	{
 		// Arrange
-		_fixture.Session
+		_fixture.AnimalSession
 			.Setup(c => c.GetById(It.IsAny<Guid>()))
 			.Returns(_fixture.GetByIdAnimalsQuery);
+
+		_fixture.OwnerSession
+			.Setup(c => c.GetById(It.IsAny<Guid>()))
+			.Returns(_fixture.GetByIdOwnersQuery);
 
 		_fixture.TransactionRunner
 			.Setup(r => r.RunInTransactionAsync(
@@ -170,9 +234,13 @@ public class AnimalsServiceTests
 	public async Task UpdateAsync_Should_ThrowOperationFailedException_WhenAnimalDeltaIsInvalid()
 	{
 		// Arrange
-		_fixture.Session
+		_fixture.AnimalSession
 			.Setup(c => c.GetById(It.IsAny<Guid>()))
 			.Returns(_fixture.GetByIdAnimalsQuery);
+
+		_fixture.OwnerSession
+			.Setup(c => c.GetById(It.IsAny<Guid>()))
+			.Returns(_fixture.GetByIdOwnersQuery);
 
 		_fixture.TransactionRunner
 			.Setup(r => r.RunInTransactionAsync(
@@ -189,7 +257,7 @@ public class AnimalsServiceTests
 	public async Task DeleteAsync_Should_ReturnTask_WhenAnimalDtoIsValid()
 	{
 		// Arrange
-		_fixture.Session
+		_fixture.AnimalSession
 			.Setup(c => c.GetById(It.IsAny<Guid>()))
 			.Returns(_fixture.GetByIdAnimalsQuery);
 
@@ -210,7 +278,7 @@ public class AnimalsServiceTests
 	public async Task DeleteAsync_Should_ThrowOperationFailedException_WhenOperationFails()
 	{
 		// Arrange
-		_fixture.Session
+		_fixture.AnimalSession
 			.Setup(s => s.GetById(It.IsAny<Guid>()))
 			.Returns(_fixture.GetByIdAnimalsQuery);
 
@@ -230,7 +298,7 @@ public class AnimalsServiceTests
 	public async Task DeleteAsync_Should_ThrowNullReferenceException_WhenAnimalDoesNotExist()
 	{
 		// Arrange
-		_fixture.Session
+		_fixture.AnimalSession
 			.Setup(s => s.GetById(It.IsAny<Guid>()))
 			.Returns(_fixture.GetByIdEmptyAnimalsQuery);
 

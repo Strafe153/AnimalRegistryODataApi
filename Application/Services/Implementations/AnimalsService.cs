@@ -2,6 +2,7 @@
 using Application.Helpers.Interfaces;
 using Application.Services.Interfaces;
 using AutoMapper;
+using DataAccess.Extensions;
 using Domain.Entities;
 using Domain.Interfaces;
 using Microsoft.AspNetCore.OData.Deltas;
@@ -11,18 +12,21 @@ namespace Application.Services.Implementations;
 
 public class AnimalsService : IAnimalsService
 {
-	private readonly IMapperSession<Animal> _session;
+	private readonly IMapperSession<Animal> _animalSession;
+	private readonly IMapperSession<Owner> _ownerSession;
 	private readonly ITransactionRunner _transactionRunner;
 	private readonly IMapper _mapper;
 	private readonly ILogger<AnimalsService> _logger;
 
 	public AnimalsService(
-		IMapperSession<Animal> session,
+		IMapperSession<Animal> animalSession,
+		IMapperSession<Owner> ownerSession,
 		ITransactionRunner transactionRunner,
 		IMapper mapper,
 		ILogger<AnimalsService> logger)
 	{
-		_session = session;
+		_animalSession = animalSession;
+		_ownerSession = ownerSession;
 		_transactionRunner = transactionRunner;
 		_mapper = mapper;
 		_logger = logger;
@@ -30,11 +34,13 @@ public class AnimalsService : IAnimalsService
 
 	public async Task<AnimalDto> CreateAsync(AnimalDto dto)
 	{
+		_ownerSession.GetByIdOrThrowAsync(dto.OwnerId, _logger);
+
 		var animal = _mapper.Map<Animal>(dto);
 
 		await _transactionRunner.RunInTransactionAsync(
-			async () => await _session.SaveAsync(animal),
-			_session,
+			() => _animalSession.SaveAsync(animal),
+			_animalSession,
 			$"Failed to create an animal.");
 
 		_logger.LogInformation("Successfully created an animal");
@@ -47,7 +53,7 @@ public class AnimalsService : IAnimalsService
 
 	public IQueryable<AnimalDto> GetAll()
 	{
-		var mappedQuery = _mapper.ProjectTo<AnimalDto>(_session.GetAll());
+		var mappedQuery = _mapper.ProjectTo<AnimalDto>(_animalSession.GetAll());
 		_logger.LogInformation("Retrieved a query of animal dtos");
 
 		return mappedQuery;
@@ -55,7 +61,7 @@ public class AnimalsService : IAnimalsService
 
 	public IQueryable<AnimalDto> GetById(Guid id)
 	{
-		var mappedQuery = _mapper.ProjectTo<AnimalDto>(_session.GetById(id));
+		var mappedQuery = _mapper.ProjectTo<AnimalDto>(_animalSession.GetById(id));
 		_logger.LogInformation("Retrieved a query of an animal dto.");
 
 		return mappedQuery;
@@ -63,17 +69,11 @@ public class AnimalsService : IAnimalsService
 
 	public async Task DeleteAsync(Guid id)
 	{
-		var animal = _session.GetById(id).FirstOrDefault();
-
-		if (animal is null)
-		{
-			_logger.LogWarning("Failed to retrieve a spell with id {Id}", id);
-			throw new NullReferenceException($"Animal with id='{id}' not found.");
-		}
+		var animal = _animalSession.GetByIdOrThrowAsync(id, _logger);
 
 		await _transactionRunner.RunInTransactionAsync(
-			async () => await _session.DeleteAsync(animal),
-			_session,
+			() => _animalSession.DeleteAsync(animal),
+			_animalSession,
 			$"Failed to delete animal with id='{id}'.");
 
 		_logger.LogInformation("Successfully deleted an animal with id={Id}", id);
@@ -81,19 +81,14 @@ public class AnimalsService : IAnimalsService
 
 	public async Task UpdateAsync(Guid id, AnimalDto dto)
 	{
-		var animal = _session.GetById(id).FirstOrDefault();
+		_ownerSession.GetByIdOrThrowAsync(dto.OwnerId, _logger);
 
-		if (animal is null)
-		{
-			_logger.LogWarning("Failed to retrieve an animal with id {Id}", id);
-			throw new NullReferenceException($"Animal with id='{id}' not found.");
-		}
-
+		var animal = _animalSession.GetByIdOrThrowAsync(id, _logger);
 		_mapper.Map(dto, animal);
 
 		await _transactionRunner.RunInTransactionAsync(
-			async () => await _session.UpdateAsync(animal),
-			_session,
+			() => _animalSession.UpdateAsync(animal),
+			_animalSession,
 			$"Failed to update animalQueryable with id='{id}'.");
 
 		_logger.LogInformation("Successfully updated an animal with id={Id}", id);
@@ -101,22 +96,17 @@ public class AnimalsService : IAnimalsService
 
 	public async Task UpdateAsync(Guid id, Delta<AnimalDto> delta)
 	{
-		var animal = _session.GetById(id).FirstOrDefault();
-
-		if (animal is null)
-		{
-			_logger.LogWarning("Failed to retrieve an animal with id {Id}", id);
-			throw new NullReferenceException($"Animal with id='{id}' not found.");
-		}
-
+		var animal = _animalSession.GetByIdOrThrowAsync(id, _logger);
 		var dto = _mapper.Map<AnimalDto>(animal);
 
 		delta.Patch(dto);
+
+		_ownerSession.GetByIdOrThrowAsync(dto.OwnerId, _logger);
 		_mapper.Map(dto, animal);
 
 		await _transactionRunner.RunInTransactionAsync(
-			async () => await _session.UpdateAsync(animal),
-			_session,
+			() => _animalSession.UpdateAsync(animal),
+			_animalSession,
 			$"Failed to update animal with id='{id}'.");
 
 		_logger.LogInformation("Successfully updated an animal with id={Id}", id);

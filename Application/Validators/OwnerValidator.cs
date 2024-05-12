@@ -3,7 +3,7 @@ using Domain.Constants;
 using FluentValidation;
 using System.Text.RegularExpressions;
 
-namespace AnimalRegistryODataApi.Validators;
+namespace Application.Validators;
 
 public class OwnerValidator : AbstractValidator<OwnerDto>
 {

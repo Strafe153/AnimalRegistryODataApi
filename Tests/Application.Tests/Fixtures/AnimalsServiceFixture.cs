@@ -58,20 +58,21 @@ public class AnimalsServiceFixture
 			.RuleFor(a => a.Owner, ownerDtoFaker)
 			.RuleFor(a => a.OwnerId, (f, u) => u.Owner!.Id);
 
-		Session = fixture.Freeze<Mock<IMapperSession<Animal>>>();
+		AnimalSession = fixture.Freeze<Mock<IMapperSession<Animal>>>();
+		OwnerSession = fixture.Freeze<Mock<IMapperSession<Owner>>>();
 		TransactionRunner = fixture.Freeze<Mock<TransactionRunner>>();
 		Mapper = new MapperConfiguration(options =>
 		{
-			options.AddProfiles(new Profile[]
-			{
+			options.AddProfiles([
 				new AnimalProfile(),
 				new OwnerProfile()
-			});
+			]);
 		}).CreateMapper();
 		Logger = fixture.Freeze<Mock<ILogger<AnimalsService>>>();
 
 		AnimalsService = new AnimalsService(
-			Session.Object,
+			AnimalSession.Object,
+			OwnerSession.Object,
 			TransactionRunner.Object,
 			Mapper,
 			Logger.Object);
@@ -82,10 +83,13 @@ public class AnimalsServiceFixture
 		GetAllAnimalsQuery = animalFaker.Generate(AnimalsCount).AsQueryable();
 		GetByIdAnimalsQuery = animalFaker.Generate(1).AsQueryable();
 		GetByIdEmptyAnimalsQuery = animalFaker.Generate(0).AsQueryable();
+		GetByIdOwnersQuery = ownerFaker.Generate(1).AsQueryable();
+		GetByIdEmptyOwnersQuery = ownerFaker.Generate(0).AsQueryable();
 	}
 
 	public AnimalsService AnimalsService { get; }
-	public Mock<IMapperSession<Animal>> Session { get; }
+	public Mock<IMapperSession<Animal>> AnimalSession { get; }
+	public Mock<IMapperSession<Owner>> OwnerSession { get; }
 	public Mock<TransactionRunner> TransactionRunner { get; }
 	public Mock<ILogger<AnimalsService>> Logger { get; }
 	public IMapper Mapper { get; }
@@ -97,4 +101,6 @@ public class AnimalsServiceFixture
 	public IQueryable<Animal> GetAllAnimalsQuery { get; }
 	public IQueryable<Animal> GetByIdAnimalsQuery { get; }
 	public IQueryable<Animal> GetByIdEmptyAnimalsQuery { get; }
+	public IQueryable<Owner> GetByIdOwnersQuery { get; }
+	public IQueryable<Owner> GetByIdEmptyOwnersQuery { get; }
 }

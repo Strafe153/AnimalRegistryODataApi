@@ -1,7 +1,7 @@
 ﻿using Application.DTOs;
 using FluentValidation;
 
-namespace AnimalRegistryODataApi.Validators;
+namespace Application.Validators;
 
 public class AnimalValidator : AbstractValidator<AnimalDto>
 {
