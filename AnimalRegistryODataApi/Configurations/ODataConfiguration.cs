@@ -16,6 +16,7 @@ public static class ODataConfiguration
 
 				options.CacheProfiles.Add(CacheConstants.Default, new CacheProfile
 				{
+					Location = ResponseCacheLocation.Any,
 					Duration = cacheOptions.Duration,
 					VaryByQueryKeys = ["*"]
 				});
