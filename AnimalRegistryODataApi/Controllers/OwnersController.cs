@@ -9,7 +9,6 @@ using Microsoft.AspNetCore.OData.Results;
 using Microsoft.AspNetCore.OData.Routing.Controllers;
 using Microsoft.AspNetCore.RateLimiting;
 using System.Net.Mime;
-using ProblemDetails = Domain.Shared.ProblemDetails;
 
 namespace AnimalRegistryODataApi.Controllers;
 

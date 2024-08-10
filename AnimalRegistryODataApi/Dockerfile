@@ -1,9 +1,8 @@
-# syntax=docker/dockerfile:1
-FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build-env
-WORKDIR /app
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+WORKDIR /source
     
 # Copy csproj and restore as distinct layers
-COPY ../*.sln ./
+COPY ../*.sln .
 COPY ../AnimalRegistryODataApi/*.csproj ./AnimalRegistryODataApi/
 COPY ../Domain/*.csproj ./Domain/
 COPY ../DataAccess/*.csproj ./DataAccess/
@@ -13,17 +12,17 @@ COPY ../Tests/Application.Tests/*.csproj ./Tests/Application.Tests/
 RUN dotnet restore
     
 # Copy everything else and build
-COPY ../AnimalRegistryODataApi/ ./AnimalRegistryODataApi/
-COPY ../Domain/ ./Domain/
-COPY ../DataAccess/ ./DataAccess/
-COPY ../Application/ ./Application/
+COPY ../AnimalRegistryODataApi/. ./AnimalRegistryODataApi/
+COPY ../Domain/. ./Domain/
+COPY ../DataAccess/. ./DataAccess/
+COPY ../Application/. ./Application/
 COPY ../Tests/Api.Tests/. /Tests/Api.Tests/
 COPY ../Tests/Application.Tests/. /Tests/Application.Tests/
-WORKDIR /app/AnimalRegistryODataApi
-RUN dotnet publish -c Release -o /app/out
+WORKDIR /source/AnimalRegistryODataApi
+RUN dotnet publish -c Release -o /app --no-restore
     
 # Build runtime image
 FROM mcr.microsoft.com/dotnet/aspnet:8.0
 WORKDIR /app
-COPY --from=build-env /app/out .
+COPY --from=build /app .
 ENTRYPOINT ["dotnet", "AnimalRegistryODataApi.dll"]

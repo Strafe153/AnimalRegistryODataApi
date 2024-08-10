@@ -1,89 +1,60 @@
 ﻿using Domain.Exceptions;
 using Domain.Shared;
-using Newtonsoft.Json;
+using Microsoft.AspNetCore.Mvc;
 using System.Net;
 using System.Net.Mime;
-using ValidationException = FluentValidation.ValidationException;
+using System.Text.Json;
 
 namespace AnimalRegistryODataApi.Middleware;
 
 public class ExceptionHandlingMiddleware : IMiddleware
 {
-	public async Task InvokeAsync(HttpContext context, RequestDelegate next)
-	{
-		try
-		{
-			await next(context);
-		}
-		catch (Exception ex)
-		{
-			await HandleExceptionAsync(context, ex);
-		}
-	}
+    public async Task InvokeAsync(HttpContext context, RequestDelegate next)
+    {
+        try
+        {
+            await next(context);
+        }
+        catch (Exception ex)
+        {
+            await HandleExceptionAsync(context, ex);
+        }
+    }
 
-	private static Task HandleExceptionAsync(HttpContext context, Exception exception)
-	{
-		var statusCode = GetHttpStatusCode(exception);
-		var statusCodeAsInt = (int)statusCode;
+    private static Task HandleExceptionAsync(HttpContext context, Exception exception)
+    {
+        var statusCode = GetHttpStatusCode(exception);
+        var statusCodeAsInt = (int)statusCode;
 
-		context.Response.ContentType = MediaTypeNames.Application.Json;
-		context.Response.StatusCode = statusCodeAsInt;
+        context.Response.ContentType = MediaTypeNames.Application.Json;
+        context.Response.StatusCode = statusCodeAsInt;
 
-		var problemDetails = GetProblemDetails(context, exception, statusCode, statusCodeAsInt);
+        ProblemDetails problemDetails = new()
+        {
+            Type = GetRFCType(statusCode),
+            Status = statusCodeAsInt,
+            Instance = context.Request.Path,
+            Detail = exception.Message
+        };
 
-		var json = JsonConvert.SerializeObject(
-			problemDetails,
-			new JsonSerializerSettings
-			{
-				NullValueHandling = NullValueHandling.Ignore
-			});
+        var json = JsonSerializer.Serialize(problemDetails);
 
-		return context.Response.WriteAsync(json);
-	}
+        return context.Response.WriteAsync(json);
+    }
 
-	private static ProblemDetails GetProblemDetails(
-		HttpContext context,
-		Exception exception,
-		HttpStatusCode statusCode,
-		int statusCodeAsInt)
-	{
-		var rfcType = GetRFCType(statusCode);
+    private static HttpStatusCode GetHttpStatusCode(Exception exception) =>
+        exception switch
+        {
+            NullReferenceException => HttpStatusCode.NotFound,
+            OperationFailedException => HttpStatusCode.BadRequest,
+            _ => HttpStatusCode.InternalServerError
+        };
 
-		var errors = exception is ValidationException validationException
-			? validationException
-				.Errors
-				.GroupBy(v => v.PropertyName)
-				.Select(g =>
-					new Error
-					{
-						 Property = g.Key,
-						ErrorMessages = g.Select(v => v.ErrorMessage).Distinct()
-					})
-			: null;
-
-		return new(
-			rfcType,
-			exception.Message,
-			statusCodeAsInt,
-			context.Request.Path,
-			exception.Message,
-			errors);
-	}
-
-	private static HttpStatusCode GetHttpStatusCode(Exception exception) =>
-		exception switch
-		{
-			NullReferenceException => HttpStatusCode.NotFound,
-			OperationFailedException => HttpStatusCode.BadRequest,
-			ValidationException => HttpStatusCode.BadRequest,
-			_ => HttpStatusCode.InternalServerError
-		};
-
-	private static string GetRFCType(HttpStatusCode statusCode) =>
-		statusCode switch
-		{
-			HttpStatusCode.NotFound => RFCType.NotFound,
-			HttpStatusCode.BadRequest => RFCType.BadRequest,
-			_ => RFCType.InternalServerError
-		};
+    private static string GetRFCType(HttpStatusCode statusCode) =>
+        statusCode switch
+        {
+            HttpStatusCode.NotFound => RFCType.NotFound,
+            HttpStatusCode.BadRequest => RFCType.BadRequest,
+            _ => RFCType.InternalServerError
+        };
 }

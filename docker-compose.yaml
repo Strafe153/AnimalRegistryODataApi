@@ -1,11 +1,9 @@
-version: '3.8'
-
 services:
-  animal_registry_odata_api:
+  animal_registry:
     build:
-      context: .
-      dockerfile: ./AnimalRegistryODataApi/Dockerfile
-    container_name: animal_registry_odata_api
+      context: ./AnimalRegistryODataApi/
+      dockerfile: Dockerfile
+    container_name: animal_registry
     ports:
       - 8080:80
       - 8081:443
