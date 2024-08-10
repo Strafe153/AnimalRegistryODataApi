@@ -37,9 +37,9 @@ public class ExceptionHandlingMiddleware : IMiddleware
             Detail = exception.Message
         };
 
-        var json = JsonSerializer.Serialize(problemDetails);
+        var jsonProblemDetails = JsonSerializer.Serialize(problemDetails);
 
-        return context.Response.WriteAsync(json);
+        return context.Response.WriteAsync(jsonProblemDetails);
     }
 
     private static HttpStatusCode GetHttpStatusCode(Exception exception) =>
