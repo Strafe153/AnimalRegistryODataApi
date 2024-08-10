@@ -22,7 +22,6 @@
 * `Moq` for mocking
 * `MSTest.TestAdapter` for adapting tests in Visual Studio
 * `MSTest.TestFramework` for unit-tests
-* `Newtonsoft.Json` for JSON serialization
 * `NHibernate` for entity mapping
 * `Oracle.ManagedDataAccess.Core` for Oracle data provider
 * `Swashbuckle.AspNetCore` for Swagger support
