@@ -19,7 +19,7 @@ COPY ../Application/. ./Application/
 COPY ../Tests/Api.Tests/. /Tests/Api.Tests/
 COPY ../Tests/Application.Tests/. /Tests/Application.Tests/
 WORKDIR /source/AnimalRegistryODataApi
-RUN dotnet publish -c Release -o /app --no-restore
+RUN dotnet publish -c release -o /app
     
 # Build runtime image
 FROM mcr.microsoft.com/dotnet/aspnet:8.0

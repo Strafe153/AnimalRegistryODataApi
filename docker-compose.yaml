@@ -1,8 +1,8 @@
 services:
   animal_registry:
     build:
-      context: ./AnimalRegistryODataApi/
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: ./AnimalRegistryODataApi/Dockerfile
     container_name: animal_registry
     ports:
       - 8080:80
@@ -16,6 +16,8 @@ services:
       - ConnectionStrings__DefaultConnection=Data Source=oracle:1521/XE;User Id=system;Password=pas5w0rd!;
     volumes:
       - ~/.aspnet/https:/https:ro
+    networks:
+      - animal_registry
     depends_on:
       - oracle
 
@@ -31,6 +33,12 @@ services:
       - ORACLE_PWD=pas5w0rd!
     volumes:
       - oracle-data:/opt/oracle/oradata
+    networks:
+      - animal_registry
 
 volumes:
   oracle-data:
+
+networks:
+  animal_registry:
+    driver: bridge
