@@ -8,7 +8,6 @@
 
 ## Dependencies
 * `AutoFixture.AutoMoq` for test fixtures
-* `AutoMapper.Extensions.Microsoft.DependencyInjection` for DTO mapping
 * `AspNetCore.HealthChecks.Oracle` for Oracle health check
 * `AspNetCore.HealthChecks.UI.Client` for detailed health checks information
 * `Bogus` for fake data generation
