@@ -1,4 +1,4 @@
-﻿using Application.DTOs;
+﻿using Application.DTOs.Owner;
 using Application.Services.Interfaces;
 using Domain.Constants;
 using Microsoft.AspNetCore.Mvc;
@@ -31,8 +31,8 @@ public class OwnersController : ODataController
 	[ResponseCache(CacheProfileName = CacheConstants.Default)]
 	[Consumes(MediaTypeNames.Application.Json)]
 	[Produces(MediaTypeNames.Application.Json)]
-	[ProducesResponseType(typeof(IQueryable<OwnerDto>), StatusCodes.Status200OK)]
-	public ActionResult<IQueryable<OwnerDto>> Get() => Ok(_ownersService.GetAll());
+	[ProducesResponseType(typeof(IQueryable<OwnerReadDto>), StatusCodes.Status200OK)]
+	public ActionResult<IQueryable<OwnerReadDto>> Get() => Ok(_ownersService.GetAll());
 
 	/// <summary>
 	/// Fetches an owner by the specified key
@@ -44,8 +44,8 @@ public class OwnersController : ODataController
 	[ResponseCache(CacheProfileName = CacheConstants.Default)]
 	[Consumes(MediaTypeNames.Application.Json)]
 	[Produces(MediaTypeNames.Application.Json)]
-	[ProducesResponseType(typeof(SingleResult<OwnerDto>), StatusCodes.Status200OK)]
-	public ActionResult<SingleResult<OwnerDto>> Get([FromODataUri] Guid key) =>
+	[ProducesResponseType(typeof(SingleResult<OwnerReadDto>), StatusCodes.Status200OK)]
+	public ActionResult<SingleResult<OwnerReadDto>> Get([FromODataUri] Guid key) =>
 		Ok(SingleResult.Create(_ownersService.GetById(key)));
 
 	/// <summary>
@@ -70,9 +70,9 @@ public class OwnersController : ODataController
 	/// <response code="400">Returns if the validations are not passed or the operation fails</response>
 	[Consumes(MediaTypeNames.Application.Json)]
 	[Produces(MediaTypeNames.Application.Json)]
-	[ProducesResponseType(typeof(OwnerDto), StatusCodes.Status201Created)]
+	[ProducesResponseType(typeof(OwnerReadDto), StatusCodes.Status201Created)]
 	[ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-	public async Task<ActionResult<OwnerDto>> Post([FromBody] OwnerDto createDto)
+	public async Task<ActionResult<OwnerReadDto>> Post([FromBody] OwnerCreateDto createDto)
 	{
 		var readDto = await _ownersService.CreateAsync(createDto);
 		return CreatedAtAction(nameof(Get), new { Key = readDto.Id }, readDto);
@@ -102,10 +102,10 @@ public class OwnersController : ODataController
 	/// <response code="404">Returns if an owner does not exist</response>
 	[Consumes(MediaTypeNames.Application.Json)]
 	[Produces(MediaTypeNames.Application.Json)]
-	[ProducesResponseType(typeof(OwnerDto), StatusCodes.Status204NoContent)]
+	[ProducesResponseType(typeof(OwnerReadDto), StatusCodes.Status204NoContent)]
 	[ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
 	[ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-	public async Task<ActionResult> Put([FromODataUri] Guid key, [FromBody] OwnerDto updateDto)
+	public async Task<ActionResult> Put([FromRoute] Guid key, [FromODataBody] OwnerUpdateDto updateDto)
 	{
 		await _ownersService.UpdateAsync(key, updateDto);
 		return NoContent();
@@ -132,10 +132,10 @@ public class OwnersController : ODataController
 	/// <response code="404">Returns if an owner does not exist</response>
 	[Consumes(MediaTypeNames.Application.Json)]
 	[Produces(MediaTypeNames.Application.Json)]
-	[ProducesResponseType(typeof(OwnerDto), StatusCodes.Status204NoContent)]
+	[ProducesResponseType(typeof(OwnerReadDto), StatusCodes.Status204NoContent)]
 	[ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
 	[ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-	public async Task<ActionResult> Patch([FromODataUri] Guid key, [FromBody] Delta<OwnerDto> delta)
+	public async Task<ActionResult> Patch([FromODataUri] Guid key, Delta<OwnerUpdateDto> delta)
 	{
 		await _ownersService.UpdateAsync(key, delta);
 		return NoContent();
@@ -151,7 +151,7 @@ public class OwnersController : ODataController
 	/// <response code="404">Returns if an owner does not exist</response>
 	[Consumes(MediaTypeNames.Application.Json)]
 	[Produces(MediaTypeNames.Application.Json)]
-	[ProducesResponseType(typeof(OwnerDto), StatusCodes.Status204NoContent)]
+	[ProducesResponseType(typeof(OwnerReadDto), StatusCodes.Status204NoContent)]
 	[ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
 	[ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
 	public async Task<ActionResult> Delete([FromODataUri] Guid key)

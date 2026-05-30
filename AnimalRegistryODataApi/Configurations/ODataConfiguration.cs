@@ -1,4 +1,5 @@
 ﻿using AnimalRegistryODataApi.Configurations.Models;
+using AnimalRegistryODataApi.Filters;
 using Domain.Constants;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData;
@@ -20,6 +21,8 @@ public static class ODataConfiguration
 					Duration = cacheOptions.Duration,
 					VaryByQueryKeys = ["*"]
 				});
+
+				options.Filters.Add<ValidationFilter>();
 			})
 			.AddOData(options =>
 			{

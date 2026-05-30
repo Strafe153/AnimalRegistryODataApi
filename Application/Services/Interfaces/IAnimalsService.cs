@@ -1,14 +1,14 @@
-﻿using Application.DTOs;
+﻿using Application.DTOs.Animal;
 using Microsoft.AspNetCore.OData.Deltas;
 
 namespace Application.Services.Interfaces;
 
 public interface IAnimalsService
 {
-	IQueryable<AnimalDto> GetAll();
-	IQueryable<AnimalDto> GetById(Guid id);
-	Task<AnimalDto> CreateAsync(AnimalDto dto);
-	Task UpdateAsync(Guid id, AnimalDto dto);
-	Task UpdateAsync(Guid id, Delta<AnimalDto> delta);
+	IQueryable<AnimalReadDto> GetAll();
+	IQueryable<AnimalReadDto> GetById(Guid id);
+	Task<AnimalReadDto> CreateAsync(AnimalCreateDto dto);
+	Task UpdateAsync(Guid id, AnimalUpdateDto dto);
+	Task UpdateAsync(Guid id, Delta<AnimalUpdateDto> delta);
 	Task DeleteAsync(Guid id);
 }

@@ -1,11 +1,14 @@
 using AnimalRegistryODataApi.Configurations;
 using AnimalRegistryODataApi.Middleware;
-using Application.AutoMapperProfiles;
+using Application.Validators.Owner;
+using FluentValidation;
 using Microsoft.AspNetCore.OData;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Logging.ConfigureLogging();
+builder.Logging
+	.ClearProviders()
+	.AddLog4Net("log4net.config");
 
 builder.Services.ConfigureDatabase(builder.Configuration);
 builder.Services.ConfigureHealthChecks(builder.Configuration);
@@ -15,10 +18,9 @@ builder.Services.ConfigureOData(builder.Configuration);
 builder.Services.AddResponseCaching();
 
 builder.Services.ConfigureServices();
-builder.Services.ConfigureMiddleware();
+builder.Services.AddSingleton<ExceptionHandlingMiddleware>();
 
-builder.Services.AddAutoMapper(typeof(OwnerProfile).Assembly);
-builder.Services.ConfigureFluentValidation();
+builder.Services.AddValidatorsFromAssemblyContaining<OwnerCreateDtoValidator>();
 
 builder.Services.ConfigureSwagger();
 

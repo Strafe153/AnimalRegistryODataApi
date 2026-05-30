@@ -1,12 +1,14 @@
-﻿using Application.DTOs;
+﻿using Application.DTOs.Animal;
 using Application.Helpers.Interfaces;
+using Application.Mappings;
 using Application.Services.Interfaces;
-using AutoMapper;
 using DataAccess.Extensions;
 using Domain.Entities;
 using Domain.Interfaces;
+using FluentValidation;
 using Microsoft.AspNetCore.OData.Deltas;
 using Microsoft.Extensions.Logging;
+using ValidationException = Application.Exceptions.ValidationException;
 
 namespace Application.Services.Implementations;
 
@@ -15,28 +17,29 @@ public class AnimalsService : IAnimalsService
 	private readonly IMapperSession<Animal> _animalSession;
 	private readonly IMapperSession<Owner> _ownerSession;
 	private readonly ITransactionRunner _transactionRunner;
-	private readonly IMapper _mapper;
+	private readonly IValidator<AnimalUpdateDto> _validator;
 	private readonly ILogger<AnimalsService> _logger;
 
 	public AnimalsService(
 		IMapperSession<Animal> animalSession,
 		IMapperSession<Owner> ownerSession,
 		ITransactionRunner transactionRunner,
-		IMapper mapper,
+		IValidator<AnimalUpdateDto> validator,
 		ILogger<AnimalsService> logger)
 	{
 		_animalSession = animalSession;
 		_ownerSession = ownerSession;
 		_transactionRunner = transactionRunner;
-		_mapper = mapper;
+		_validator = validator;
 		_logger = logger;
 	}
 
-	public async Task<AnimalDto> CreateAsync(AnimalDto dto)
+	public async Task<AnimalReadDto> CreateAsync(AnimalCreateDto dto)
 	{
-		_ownerSession.GetByIdOrThrowAsync(dto.OwnerId, _logger);
+		var owner = _ownerSession.GetByIdOrThrow(dto.OwnerId, _logger);
 
-		var animal = _mapper.Map<Animal>(dto);
+		var animal = dto.ToAnimal();
+		animal.Owner = owner;
 
 		await _transactionRunner.RunInTransactionAsync(
 			() => _animalSession.SaveAsync(animal),
@@ -45,23 +48,20 @@ public class AnimalsService : IAnimalsService
 
 		_logger.LogInformation("Successfully created an animal");
 
-		var readDto = _mapper.Map<AnimalDto>(dto);
-		readDto.Id = animal.Id;
-
-		return readDto;
+		return animal.ToReadDto();
 	}
 
-	public IQueryable<AnimalDto> GetAll()
+	public IQueryable<AnimalReadDto> GetAll()
 	{
-		var mappedQuery = _mapper.ProjectTo<AnimalDto>(_animalSession.GetAll());
+		var mappedQuery = _animalSession.GetAll().Select(a => a.ToReadDto(true));
 		_logger.LogInformation("Retrieved a query of animal dtos");
 
 		return mappedQuery;
 	}
 
-	public IQueryable<AnimalDto> GetById(Guid id)
+	public IQueryable<AnimalReadDto> GetById(Guid id)
 	{
-		var mappedQuery = _mapper.ProjectTo<AnimalDto>(_animalSession.GetById(id));
+		var mappedQuery = _animalSession.GetById(id).Select(a => a.ToReadDto(true));
 		_logger.LogInformation("Retrieved a query of an animal dto.");
 
 		return mappedQuery;
@@ -69,7 +69,7 @@ public class AnimalsService : IAnimalsService
 
 	public async Task DeleteAsync(Guid id)
 	{
-		var animal = _animalSession.GetByIdOrThrowAsync(id, _logger);
+		var animal = _animalSession.GetByIdOrThrow(id, _logger);
 
 		await _transactionRunner.RunInTransactionAsync(
 			() => _animalSession.DeleteAsync(animal),
@@ -79,12 +79,12 @@ public class AnimalsService : IAnimalsService
 		_logger.LogInformation("Successfully deleted an animal with id={Id}", id);
 	}
 
-	public async Task UpdateAsync(Guid id, AnimalDto dto)
+	public async Task UpdateAsync(Guid id, AnimalUpdateDto dto)
 	{
-		_ownerSession.GetByIdOrThrowAsync(dto.OwnerId, _logger);
+		_ownerSession.GetByIdOrThrow(dto.OwnerId, _logger);
 
-		var animal = _animalSession.GetByIdOrThrowAsync(id, _logger);
-		_mapper.Map(dto, animal);
+		var animal = _animalSession.GetByIdOrThrow(id, _logger);
+		dto.Update(animal);
 
 		await _transactionRunner.RunInTransactionAsync(
 			() => _animalSession.UpdateAsync(animal),
@@ -94,15 +94,22 @@ public class AnimalsService : IAnimalsService
 		_logger.LogInformation("Successfully updated an animal with id={Id}", id);
 	}
 
-	public async Task UpdateAsync(Guid id, Delta<AnimalDto> delta)
+	public async Task UpdateAsync(Guid id, Delta<AnimalUpdateDto> delta)
 	{
-		var animal = _animalSession.GetByIdOrThrowAsync(id, _logger);
-		var dto = _mapper.Map<AnimalDto>(animal);
+		var animal = _animalSession.GetByIdOrThrow(id, _logger);
+		var dto = animal.ToUpdateDto();
+
+		_ownerSession.GetByIdOrThrow(dto.OwnerId, _logger);
 
 		delta.Patch(dto);
+		var validationResult = await _validator.ValidateAsync(dto);
 
-		_ownerSession.GetByIdOrThrowAsync(dto.OwnerId, _logger);
-		_mapper.Map(dto, animal);
+		if (!validationResult.IsValid)
+		{
+			throw new ValidationException(validationResult);
+		}
+
+		dto.Update(animal);
 
 		await _transactionRunner.RunInTransactionAsync(
 			() => _animalSession.UpdateAsync(animal),

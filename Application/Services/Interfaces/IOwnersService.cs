@@ -1,14 +1,14 @@
-﻿using Application.DTOs;
+﻿using Application.DTOs.Owner;
 using Microsoft.AspNetCore.OData.Deltas;
 
 namespace Application.Services.Interfaces;
 
 public interface IOwnersService
 {
-	IQueryable<OwnerDto> GetAll();
-	IQueryable<OwnerDto> GetById(Guid id);
-	Task<OwnerDto> CreateAsync(OwnerDto dto);
-	Task UpdateAsync(Guid id, OwnerDto dto);
-	Task UpdateAsync(Guid id, Delta<OwnerDto> delta);
+	IQueryable<OwnerReadDto> GetAll();
+	IQueryable<OwnerReadDto> GetById(Guid id);
+	Task<OwnerReadDto> CreateAsync(OwnerCreateDto dto);
+	Task UpdateAsync(Guid id, OwnerUpdateDto dto);
+	Task UpdateAsync(Guid id, Delta<OwnerUpdateDto> delta);
 	Task DeleteAsync(Guid id);
 }

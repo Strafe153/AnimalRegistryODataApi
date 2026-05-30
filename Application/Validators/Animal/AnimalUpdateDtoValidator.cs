@@ -1,13 +1,13 @@
-﻿using Application.DTOs;
+using Application.DTOs.Animal;
 using FluentValidation;
 
-namespace Application.Validators;
+namespace Application.Validators.Animal;
 
-public class AnimalValidator : AbstractValidator<AnimalDto>
+public class AnimalUpdateDtoValidator : AbstractValidator<AnimalUpdateDto>
 {
-	public AnimalValidator()
+	public AnimalUpdateDtoValidator()
 	{
-		RuleFor(o => o.PetName)
+		RuleFor(a => a.PetName)
 			.NotEmpty()
 			.WithMessage("Pet Name is required")
 			.MinimumLength(2)
@@ -15,7 +15,7 @@ public class AnimalValidator : AbstractValidator<AnimalDto>
 			.MaximumLength(25)
 			.WithMessage("Pet Name must not be longer than 25 characters");
 
-		RuleFor(o => o.Kind)
+		RuleFor(a => a.Kind)
 			.NotEmpty()
 			.WithMessage("Kind is required")
 			.MinimumLength(1)
@@ -23,13 +23,13 @@ public class AnimalValidator : AbstractValidator<AnimalDto>
 			.MaximumLength(50)
 			.WithMessage("Kind must not be longer than 50 characters");
 
-		RuleFor(o => (int)o.Age)
+		RuleFor(a => (int)a.Age)
 			.GreaterThan(0)
 			.WithMessage("Age must be greater than 0")
 			.LessThan(50)
 			.WithMessage("Age must be less than 50");
 
-		RuleFor(o => o.OwnerId)
+		RuleFor(a => a.OwnerId)
 			.NotEmpty()
 			.WithMessage("Owner Id is required");
 	}

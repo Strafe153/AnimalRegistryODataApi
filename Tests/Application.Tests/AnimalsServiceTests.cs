@@ -1,9 +1,9 @@
-﻿using Application.Tests.Fixtures;
+﻿using Application.DTOs.Animal;
+using Application.Exceptions;
+using Application.Tests.Fixtures;
 using Domain.Entities;
-using Domain.Exceptions;
-using Domain.Interfaces;
+using Microsoft.AspNetCore.OData.Deltas;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Moq;
 
 namespace Application.Tests;
 
@@ -22,46 +22,140 @@ public class AnimalsServiceTests
 	public void GetAll_Should_ReturnIQueryableOfAnimalDto()
 	{
 		// Arrange
+		var firstAnimalId = Guid.NewGuid();
+		var secondAnimalId = Guid.NewGuid();
+		var ownerId = Guid.NewGuid();
+
+		var owner = new Owner
+		{
+			Id = ownerId,
+			FirstName = "Ren",
+			LastName = "Amamiya",
+			Age = 16,
+			Email = "joker@mail.com",
+			PhoneNumber = "0983471892",
+			Animals = []
+		};
+
+		var animalsQuery = new Animal[]
+		{
+			new()
+			{
+				Id = firstAnimalId,
+				PetName = "Morgana",
+				Kind = "Not a cat",
+				Age = 1,
+				Owner = owner
+			},
+			new()
+			{
+				Id = secondAnimalId,
+				PetName = "Sissel",
+				Kind = "Cat",
+				Age = 4,
+				Owner = owner
+			}
+		}.AsQueryable();
+
 		_fixture.AnimalSession
 			.Setup(s => s.GetAll())
-			.Returns(_fixture.GetAllAnimalsQuery);
+			.Returns(animalsQuery);
 
 		// Act
-
-		var result = _fixture.AnimalsService.GetAll();
+		var sut = _fixture.CreateSut();
+		var result = sut.GetAll().ToList();
 
 		// Assert
-		Assert.AreEqual(_fixture.AnimalsCount, result.Count());
+		Assert.AreEqual(2, result.Count);
+		Assert.IsTrue(result.All(a => a.Owner.Id == ownerId));
+
+		CollectionAssert.AreEquivalent(
+			new[] { firstAnimalId, secondAnimalId},
+			result.Select(a => a.Id).ToArray());
 	}
 
 	[TestMethod]
 	public void GetById_Should_ReturnIQueryableOfAnimalDto()
 	{
 		// Arrange
+		var animalid = Guid.NewGuid();
+		var ownerId = Guid.NewGuid();
+
+		var animalQuery = new Animal[]
+		{
+			new()
+			{
+				Id = animalid,
+				PetName = "Morgana",
+				Kind = "Not a cat",
+				Age = 1,
+				Owner = new Owner
+				{
+					Id = ownerId,
+					FirstName = "Ren",
+					LastName = "Amamiya",
+					Age = 16,
+					Email = "joker@mail.com",
+					PhoneNumber = "0983471892",
+					Animals = []
+				}
+			}
+		}.AsQueryable();
+
 		_fixture.AnimalSession
-			.Setup(s => s.GetById(It.IsAny<Guid>()))
-			.Returns(_fixture.GetByIdAnimalsQuery);
+			.Setup(s => s.GetById(animalid))
+			.Returns(animalQuery);
 
 		// Act
-		var result = _fixture.AnimalsService.GetById(_fixture.Id);
+		var sut = _fixture.CreateSut();
+		var animal = sut.GetById(animalid).First();
 
 		// Assert
-		Assert.AreEqual(1, result.Count());
+		Assert.IsTrue(animal is not null);
+		Assert.AreEqual(animalid, animal.Id);
+		Assert.AreEqual(ownerId, animal.Owner.Id);
 	}
 
 	[TestMethod]
 	public async Task CreateAsync_Should_ReturnAnimalDto_WhenAnimalDtoIsValid()
 	{
 		// Arrange
+		var ownerId = Guid.NewGuid();
+
+		var ownerQuery = new Owner[]
+		{
+			new()
+			{
+				Id = ownerId,
+				FirstName = "Ren",
+				LastName = "Amamiya",
+				Age = 16,
+				Email = "joker@mail.com",
+				PhoneNumber = "0983471892",
+				Animals = []
+			}
+		}.AsQueryable();
+
+		var animalDto = new AnimalCreateDto
+		{
+			PetName = "Morgana",
+			Kind = "Not a cat",
+			Age = 1,
+			OwnerId = ownerId
+		};
+
 		_fixture.OwnerSession
-			.Setup(c => c.GetById(It.IsAny<Guid>()))
-			.Returns(_fixture.GetByIdOwnersQuery);
+			.Setup(c => c.GetById(ownerId))
+			.Returns(ownerQuery);
 
 		// Act
-		var result = await _fixture.AnimalsService.CreateAsync(_fixture.AnimalDto);
+		var sut = _fixture.CreateSut();
+		var result = await sut.CreateAsync(animalDto);
 
 		// Assert
 		Assert.IsNotNull(result);
+		Assert.AreEqual("Morgana", result.PetName);
+		Assert.AreEqual(ownerId, result.Owner.Id);
 	}
 
 	[TestMethod]
@@ -69,97 +163,97 @@ public class AnimalsServiceTests
 	public async Task CreateAsync_Should_ThrowNullReferenceException_WhenOwnerDoesNotExist()
 	{
 		// Arrange
+		var ownerId = Guid.NewGuid();
+
+		var ownerQuery = new Owner[]
+		{
+			new()
+			{
+				Id = ownerId,
+				FirstName = "Ren",
+				LastName = "Amamiya",
+				Age = 16,
+				Email = "joker@mail.com",
+				PhoneNumber = "0983471892",
+				Animals = []
+			}
+		}.AsQueryable();
+
+		var animalDto = new AnimalCreateDto
+		{
+			PetName = "Morgana",
+			Kind = "Not a cat",
+			Age = 1,
+			OwnerId = ownerId
+		};
+
 		_fixture.OwnerSession
-			.Setup(c => c.GetById(It.IsAny<Guid>()))
-			.Returns(_fixture.GetByIdEmptyOwnersQuery);
+			.Setup(c => c.GetById(Guid.NewGuid()))
+			.Returns(ownerQuery);
 
 		// Act
-		await _fixture.AnimalsService.CreateAsync(_fixture.AnimalDto);
-	}
-
-	[TestMethod]
-	[ExpectedException(typeof(OperationFailedException))]
-	public async Task CreateAsync_Should_ThrowOperationFailedException_WhenAnimalDtoIsInvalid()
-	{
-		// Arrange
-		_fixture.AnimalSession
-			.Setup(c => c.GetById(It.IsAny<Guid>()))
-			.Returns(_fixture.GetByIdAnimalsQuery);
-
-		_fixture.OwnerSession
-			.Setup(c => c.GetById(It.IsAny<Guid>()))
-			.Returns(_fixture.GetByIdOwnersQuery);
-
-		_fixture.TransactionRunner
-			.Setup(r => r.RunInTransactionAsync(
-				It.IsAny<Func<Task>>(),
-				It.IsAny<IMapperSession<Animal>>(),
-				It.IsAny<string>()))
-			.Throws(new OperationFailedException(_fixture.Id.ToString()));
-
-		// Act
-		await _fixture.AnimalsService.CreateAsync(_fixture.AnimalDto);
+		var sut = _fixture.CreateSut();
+		await sut.CreateAsync(animalDto);
 	}
 
 	[TestMethod]
 	public async Task UpdateAsync_Should_ReturnTask_WhenAnimalDtoIsValid()
 	{
 		// Arrange
-		_fixture.AnimalSession
-			.Setup(c => c.GetById(It.IsAny<Guid>()))
-			.Returns(_fixture.GetByIdAnimalsQuery);
+		var animalId = Guid.NewGuid();
+		var ownerId = Guid.NewGuid();
+
+		var owner = new Owner()
+		{
+			Id = ownerId,
+			FirstName = "Ren",
+			LastName = "Amamiya",
+			Age = 16,
+			Email = "joker@mail.com",
+			PhoneNumber = "0983471892",
+			Animals = []
+		};
+
+		var ownerQuery = new Owner[] { owner }.AsQueryable();
+
+		var animalQuery = new Animal[]
+		{
+			new()
+			{
+				PetName = "Fluffy",
+				Kind = "Cat",
+				Age = 2,
+				Owner = owner
+			}
+		}.AsQueryable();
+
+		var animalDto = new AnimalUpdateDto
+		{
+			PetName = "Morgana",
+			Kind = "Not a cat",
+			Age = 1,
+			OwnerId = ownerId
+		};
 
 		_fixture.OwnerSession
-			.Setup(c => c.GetById(It.IsAny<Guid>()))
-			.Returns(_fixture.GetByIdOwnersQuery);
+			.Setup(c => c.GetById(ownerId))
+			.Returns(ownerQuery);
+
+		_fixture.AnimalSession
+			.Setup(c => c.GetById(animalId))
+			.Returns(animalQuery);
 
 		try
 		{
 			// Act
-			await _fixture.AnimalsService.UpdateAsync(_fixture.Id, _fixture.AnimalDto);
+			var sut = _fixture.CreateSut();
+			await sut.UpdateAsync(animalId, animalDto);
 		}
 		catch
 		{
 			// Assert
 			Assert.Fail();
 		}
-	}
-
-	[TestMethod]
-	public async Task UpdateAsync_Should_ReturnTask_WhenAnimalDeltaIsValid()
-	{
-		// Arrange
-		_fixture.AnimalSession
-			.Setup(c => c.GetById(It.IsAny<Guid>()))
-			.Returns(_fixture.GetByIdAnimalsQuery);
-
-		_fixture.OwnerSession
-			.Setup(c => c.GetById(It.IsAny<Guid>()))
-			.Returns(_fixture.GetByIdOwnersQuery);
-
-		try
-		{
-			// Act
-			await _fixture.AnimalsService.UpdateAsync(_fixture.Id, _fixture.AnimalDtoDelta);
-		}
-		catch
-		{
-			// Assert
-			Assert.Fail();
-		}
-	}
-
-	[TestMethod]
-	[ExpectedException(typeof(NullReferenceException))]
-	public async Task UpdateAsync_Should_ThrowNullReferenceException_WhenAnimalDoesNotExist()
-	{
-		// Arrange
-		_fixture.AnimalSession
-			.Setup(s => s.GetById(It.IsAny<Guid>()))
-			.Returns(_fixture.GetByIdEmptyAnimalsQuery);
-
-		// Act
-		await _fixture.AnimalsService.UpdateAsync(_fixture.Id, _fixture.AnimalDto);
 	}
 
 	[TestMethod]
@@ -167,104 +261,151 @@ public class AnimalsServiceTests
 	public async Task UpdateAsync_Should_ThrowNullReferenceException_WhenOwnerDoesNotExist()
 	{
 		// Arrange
+		var ownerId = Guid.NewGuid();
+
+		var ownerQuery = new Owner[]
+		{
+			new()
+			{
+				Id = ownerId,
+				FirstName = "Ren",
+				LastName = "Amamiya",
+				Age = 16,
+				Email = "joker@mail.com",
+				PhoneNumber = "0983471892",
+				Animals = []
+			}
+		}.AsQueryable();
+
+		var animalDto = new AnimalUpdateDto
+		{
+			PetName = "Morgana",
+			Kind = "Not a cat",
+			Age = 1,
+			OwnerId = Guid.NewGuid()
+		};
+
 		_fixture.OwnerSession
-			.Setup(c => c.GetById(It.IsAny<Guid>()))
-			.Returns(_fixture.GetByIdEmptyOwnersQuery);
+			.Setup(s => s.GetById(ownerId))
+			.Returns(ownerQuery);
 
 		// Act
-		await _fixture.AnimalsService.UpdateAsync(_fixture.Id, _fixture.AnimalDto);
+		var sut = _fixture.CreateSut();
+		await sut.UpdateAsync(Guid.NewGuid(), animalDto);
 	}
 
 	[TestMethod]
 	[ExpectedException(typeof(NullReferenceException))]
-	public async Task UpdateAsync_Should_ThrowNullReferenceException_WithDeltaWhenAnimalDoesNotExist()
+	public async Task UpdateAsync_Should_ThrowNullReferenceException_WhenAnimalDoesNotExist()
 	{
 		// Arrange
-		_fixture.AnimalSession
-			.Setup(s => s.GetById(It.IsAny<Guid>()))
-			.Returns(_fixture.GetByIdEmptyAnimalsQuery);
+		var animalId = Guid.NewGuid();
+		var ownerId = Guid.NewGuid();
 
-		// Act
-		await _fixture.AnimalsService.UpdateAsync(_fixture.Id, _fixture.AnimalDtoDelta);
-	}
+		var owner = new Owner()
+		{
+			Id = ownerId,
+			FirstName = "Ren",
+			LastName = "Amamiya",
+			Age = 16,
+			Email = "joker@mail.com",
+			PhoneNumber = "0983471892",
+			Animals = []
+		};
 
-	[TestMethod]
-	[ExpectedException(typeof(NullReferenceException))]
-	public async Task UpdateAsync_Should_ThrowNullReferenceException_WithDeltaWhenOwnerDoesNotExist()
-	{
-		// Arrange
-		_fixture.AnimalSession
-			.Setup(s => s.GetById(It.IsAny<Guid>()))
-			.Returns(_fixture.GetByIdEmptyAnimalsQuery);
+		var ownerQuery = new Owner[] { owner }.AsQueryable();
+
+		var animalQuery = new Animal[]
+		{
+			new()
+			{
+				Id = animalId,
+				PetName = "Morgana",
+				Kind = "Not a cat",
+				Age = 1,
+				Owner = owner
+			}
+		}.AsQueryable();
+
+		var animalDto = new AnimalUpdateDto
+		{
+			PetName = "Morgana",
+			Kind = "Not a cat",
+			Age = 1,
+			OwnerId = ownerId
+		};
 
 		_fixture.OwnerSession
-			.Setup(c => c.GetById(It.IsAny<Guid>()))
-			.Returns(_fixture.GetByIdEmptyOwnersQuery);
+			.Setup(c => c.GetById(ownerId))
+			.Returns(ownerQuery);
+
+		_fixture.AnimalSession
+			.Setup(c => c.GetById(animalId))
+			.Returns(animalQuery);
 
 		// Act
-		await _fixture.AnimalsService.UpdateAsync(_fixture.Id, _fixture.AnimalDtoDelta);
+		var sut = _fixture.CreateSut();
+		await sut.UpdateAsync(Guid.NewGuid(), animalDto);
 	}
 
 	[TestMethod]
-	[ExpectedException(typeof(OperationFailedException))]
-	public async Task UpdateAsync_Should_ThrowOperationFailedException_WhenAnimalDtoIsInvalid()
+	[DataRow(nameof(AnimalUpdateDto.PetName), "Sissel")]
+	[DataRow(nameof(AnimalUpdateDto.Kind), "Definitely, not a cat")]
+	[DataRow(nameof(AnimalUpdateDto.Age), 3)]
+	public async Task UpdateAsync_Should_ReturnTask_WhenAnimalDeltaIsValid(string property, object value)
 	{
 		// Arrange
-		_fixture.AnimalSession
-			.Setup(c => c.GetById(It.IsAny<Guid>()))
-			.Returns(_fixture.GetByIdAnimalsQuery);
+		var animalId = Guid.NewGuid();
+		var ownerId = Guid.NewGuid();
+
+		var owner = new Owner
+		{
+			Id = ownerId,
+			FirstName = "Ren",
+			LastName = "Amamiya",
+			Age = 16,
+			Email = "joker@mail.com",
+			PhoneNumber = "0983471892",
+			Animals = []
+		};
+
+		var ownerQuery = new Owner[] { owner }.AsQueryable();
+
+		var animalQuery = new Animal[]
+		{
+			new()
+			{
+				PetName = "Fluffy",
+				Kind = "Cat",
+				Age = 2,
+				Owner = owner
+			}
+		}.AsQueryable();
+
+		var animalDto = new AnimalUpdateDto
+		{
+			PetName = "Morgana",
+			Kind = "Not a cat",
+			Age = 1,
+			OwnerId = ownerId
+		};
+
+		var delta = new Delta<AnimalUpdateDto>();
+		delta.TrySetPropertyValue(property, value);
 
 		_fixture.OwnerSession
-			.Setup(c => c.GetById(It.IsAny<Guid>()))
-			.Returns(_fixture.GetByIdOwnersQuery);
+			.Setup(c => c.GetById(ownerId))
+			.Returns(ownerQuery);
 
-		_fixture.TransactionRunner
-			.Setup(r => r.RunInTransactionAsync(
-				It.IsAny<Func<Task>>(),
-				It.IsAny<IMapperSession<Animal>>(),
-				It.IsAny<string>()))
-			.Throws(new OperationFailedException(_fixture.Id.ToString()));
-
-		// Act
-		await _fixture.AnimalsService.UpdateAsync(_fixture.Id, _fixture.AnimalDto);
-	}
-
-	[TestMethod]
-	[ExpectedException(typeof(OperationFailedException))]
-	public async Task UpdateAsync_Should_ThrowOperationFailedException_WhenAnimalDeltaIsInvalid()
-	{
-		// Arrange
 		_fixture.AnimalSession
-			.Setup(c => c.GetById(It.IsAny<Guid>()))
-			.Returns(_fixture.GetByIdAnimalsQuery);
-
-		_fixture.OwnerSession
-			.Setup(c => c.GetById(It.IsAny<Guid>()))
-			.Returns(_fixture.GetByIdOwnersQuery);
-
-		_fixture.TransactionRunner
-			.Setup(r => r.RunInTransactionAsync(
-				It.IsAny<Func<Task>>(),
-				It.IsAny<IMapperSession<Animal>>(),
-				It.IsAny<string>()))
-			.Throws(new OperationFailedException(_fixture.Id.ToString()));
-
-		// Act
-		await _fixture.AnimalsService.UpdateAsync(_fixture.Id, _fixture.AnimalDtoDelta);
-	}
-
-	[TestMethod]
-	public async Task DeleteAsync_Should_ReturnTask_WhenAnimalDtoIsValid()
-	{
-		// Arrange
-		_fixture.AnimalSession
-			.Setup(c => c.GetById(It.IsAny<Guid>()))
-			.Returns(_fixture.GetByIdAnimalsQuery);
+			.Setup(c => c.GetById(animalId))
+			.Returns(animalQuery);
 
 		try
 		{
 			// Act
-			await _fixture.AnimalsService.DeleteAsync(_fixture.Id);
+			var sut = _fixture.CreateSut();
+			await sut.UpdateAsync(animalId, delta);
 		}
 		catch
 		{
@@ -274,23 +415,190 @@ public class AnimalsServiceTests
 	}
 
 	[TestMethod]
-	[ExpectedException(typeof(OperationFailedException))]
-	public async Task DeleteAsync_Should_ThrowOperationFailedException_WhenOperationFails()
+	[DynamicData(nameof(GetPatchValidationExceptionData), DynamicDataSourceType.Method)]
+	[ExpectedException(typeof(ValidationException))]
+	public async Task UpdateAsync_Should_ThrowValidationException_WhenAnimalDeltaIsInvalid(
+		string property,
+		object value)
 	{
 		// Arrange
-		_fixture.AnimalSession
-			.Setup(s => s.GetById(It.IsAny<Guid>()))
-			.Returns(_fixture.GetByIdAnimalsQuery);
+		var animalId = Guid.NewGuid();
+		var ownerId = Guid.NewGuid();
 
-		_fixture.TransactionRunner
-			.Setup(r => r.RunInTransactionAsync(
-				It.IsAny<Func<Task>>(),
-				It.IsAny<IMapperSession<Animal>>(),
-				It.IsAny<string>()))
-			.Throws(new OperationFailedException(_fixture.Id.ToString()));
+		var owner = new Owner
+		{
+			Id = ownerId,
+			FirstName = "Ren",
+			LastName = "Amamiya",
+			Age = 16,
+			Email = "joker@mail.com",
+			PhoneNumber = "0983471892",
+			Animals = []
+		};
+
+		var ownerQuery = new Owner[] { owner }.AsQueryable();
+
+		var animalQuery = new Animal[]
+		{
+			new()
+			{
+				PetName = "Fluffy",
+				Kind = "Cat",
+				Age = 2,
+				Owner = owner
+			}
+		}.AsQueryable();
+
+		var animalDto = new AnimalUpdateDto
+		{
+			PetName = "Morgana",
+			Kind = "Not a cat",
+			Age = 1,
+			OwnerId = ownerId
+		};
+
+		var delta = new Delta<AnimalUpdateDto>();
+		delta.TrySetPropertyValue(property, value);
+
+		_fixture.OwnerSession
+			.Setup(c => c.GetById(ownerId))
+			.Returns(ownerQuery);
+
+		_fixture.AnimalSession
+			.Setup(c => c.GetById(animalId))
+			.Returns(animalQuery);
 
 		// Act
-		await _fixture.AnimalsService.DeleteAsync(_fixture.Id);
+		var sut = _fixture.CreateSut();
+		await sut.UpdateAsync(animalId, delta);
+	}
+
+	[TestMethod]
+	[ExpectedException(typeof(NullReferenceException))]
+	public async Task UpdateAsync_Should_ThrowNullReferenceException_WithDeltaWhenAnimalDoesNotExist()
+	{
+		// Arrange
+		var ownerId = Guid.NewGuid();
+
+		var ownerQuery = new Owner[]
+		{
+			new()
+			{
+				Id = ownerId,
+				FirstName = "Ren",
+				LastName = "Amamiya",
+				Age = 16,
+				Email = "joker@mail.com",
+				PhoneNumber = "0983471892",
+				Animals = []
+			}
+		}.AsQueryable();
+
+		var delta = new Delta<AnimalUpdateDto>();
+		delta.TrySetPropertyValue(nameof(AnimalUpdateDto.OwnerId), Guid.NewGuid());
+		delta.TrySetPropertyValue(nameof(AnimalUpdateDto.PetName), "Kitty");
+
+		_fixture.OwnerSession
+			.Setup(s => s.GetById(ownerId))
+			.Returns(ownerQuery);
+
+		// Act
+		var sut = _fixture.CreateSut();
+		await sut.UpdateAsync(Guid.NewGuid(), new Delta<AnimalUpdateDto>());
+	}
+
+	[TestMethod]
+	[ExpectedException(typeof(NullReferenceException))]
+	public async Task UpdateAsync_Should_ThrowNullReferenceException_WithDeltaWhenOwnerDoesNotExist()
+	{
+		// Arrange
+		var animalId = Guid.NewGuid();
+		var ownerId = Guid.NewGuid();
+
+		var owner = new Owner()
+		{
+			Id = ownerId,
+			FirstName = "Ren",
+			LastName = "Amamiya",
+			Age = 16,
+			Email = "joker@mail.com",
+			PhoneNumber = "0983471892",
+			Animals = []
+		};
+
+		var ownerQuery = new Owner[] { owner }.AsQueryable();
+
+		var animalQuery = new Animal[]
+		{
+			new()
+			{
+				Id = animalId,
+				PetName = "Morgana",
+				Kind = "Not a cat",
+				Age = 1,
+				Owner = owner
+			}
+		}.AsQueryable();
+
+		var delta = new Delta<AnimalUpdateDto>();
+		delta.TrySetPropertyValue(nameof(AnimalUpdateDto.Age), 3);
+		delta.TrySetPropertyValue(nameof(AnimalUpdateDto.Kind), "Definitely, not a cat");
+
+		_fixture.OwnerSession
+			.Setup(c => c.GetById(ownerId))
+			.Returns(ownerQuery);
+
+		_fixture.AnimalSession
+			.Setup(c => c.GetById(animalId))
+			.Returns(animalQuery);
+
+		// Act
+		var sut = _fixture.CreateSut();
+		await sut.UpdateAsync(Guid.NewGuid(), delta);
+	}
+
+	[TestMethod]
+	public async Task DeleteAsync_Should_ReturnTask_WhenAnimalDtoIsValid()
+	{
+		// Arrange
+		var animalId = Guid.NewGuid();
+
+		var animalQuery = new Animal[]
+		{
+			new()
+			{
+				Id = animalId,
+				PetName = "Morgana",
+				Kind = "Not a cat",
+				Age = 1,
+				Owner = new()
+				{
+					Id = Guid.NewGuid(),
+					FirstName = "Ren",
+					LastName = "Amamiya",
+					Age = 16,
+					Email = "joker@mail.com",
+					PhoneNumber = "0983471892",
+					Animals = []
+				}
+			}
+		}.AsQueryable();
+
+		_fixture.AnimalSession
+			.Setup(c => c.GetById(animalId))
+			.Returns(animalQuery);
+
+		try
+		{
+			// Act
+			var sut = _fixture.CreateSut();
+			await sut.DeleteAsync(animalId);
+		}
+		catch
+		{
+			// Assert
+			Assert.Fail();
+		}
 	}
 
 	[TestMethod]
@@ -298,11 +606,74 @@ public class AnimalsServiceTests
 	public async Task DeleteAsync_Should_ThrowNullReferenceException_WhenAnimalDoesNotExist()
 	{
 		// Arrange
+		var animalId = Guid.NewGuid();
+
+		var animalQuery = new Animal[]
+		{
+			new()
+			{
+				Id = animalId,
+				PetName = "Morgana",
+				Kind = "Not a cat",
+				Age = 1,
+				Owner = new()
+				{
+					Id = Guid.NewGuid(),
+					FirstName = "Ren",
+					LastName = "Amamiya",
+					Age = 16,
+					Email = "joker@mail.com",
+					PhoneNumber = "0983471892",
+					Animals = []
+				}
+			}
+		}.AsQueryable();
+
 		_fixture.AnimalSession
-			.Setup(s => s.GetById(It.IsAny<Guid>()))
-			.Returns(_fixture.GetByIdEmptyAnimalsQuery);
+			.Setup(c => c.GetById(animalId))
+			.Returns(animalQuery);
 
 		// Act
-		await _fixture.AnimalsService.DeleteAsync(_fixture.Id);
+		var sut = _fixture.CreateSut();
+		await sut.DeleteAsync(Guid.NewGuid());
+	}
+
+	private static IEnumerable<object[]> GetPatchValidationExceptionData()
+	{
+		yield return new object[]
+		{
+			nameof(AnimalUpdateDto.PetName),
+			string.Empty
+		};
+
+		yield return new object[]
+		{
+			nameof(AnimalUpdateDto.PetName),
+			"New pet name exceeding length"
+		};
+
+		yield return new object[]
+		{
+			nameof(AnimalUpdateDto.Kind),
+			string.Empty
+		};
+
+		yield return new object[]
+		{
+			nameof(AnimalUpdateDto.Kind),
+			"New long pet kind that exceeds max length validation"
+		};
+
+		yield return new object[]
+		{
+			nameof(AnimalUpdateDto.Age),
+			(byte)0
+		};
+
+		yield return new object[]
+		{
+			nameof(AnimalUpdateDto.Age),
+			(byte)51
+		};
 	}
 }
