@@ -1,13 +1,11 @@
-﻿using Application.DTOs;
-using Domain.Constants;
+﻿using Application.DTOs.Owner;
 using FluentValidation;
-using System.Text.RegularExpressions;
 
-namespace Application.Validators;
+namespace Application.Validators.Owner;
 
-public class OwnerValidator : AbstractValidator<OwnerDto>
+public class OwnerCreateDtoValidator : AbstractValidator<OwnerCreateDto>
 {
-	public OwnerValidator()
+	public OwnerCreateDtoValidator()
 	{
 		RuleFor(o => o.FirstName)
 			.NotEmpty()
@@ -44,7 +42,7 @@ public class OwnerValidator : AbstractValidator<OwnerDto>
 			.WithMessage("Phone number length must be at least 10 characters long")
 			.MaximumLength(20)
 			.WithMessage("Phone number length must be less than 20 characters")
-			.Matches(new Regex(ValidatorConstants.PhoneNumberPattern))
+			.Matches(CustomValidators.PhoneNumberValidator())
 			.WithMessage("Incorrect phone number format");
 	}
 }

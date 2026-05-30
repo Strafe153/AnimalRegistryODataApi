@@ -1,4 +1,4 @@
-﻿using Domain.Exceptions;
+﻿using Application.Exceptions;
 using Domain.Shared;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
@@ -36,6 +36,14 @@ public class ExceptionHandlingMiddleware : IMiddleware
             Instance = context.Request.Path,
             Detail = exception.Message
         };
+
+        if (exception is ValidationException ex)
+        {
+            problemDetails.Extensions = new Dictionary<string, object?>()
+            {
+                { "errors", ex.Errors }
+            };
+        }
 
         var jsonProblemDetails = JsonSerializer.Serialize(problemDetails);
 

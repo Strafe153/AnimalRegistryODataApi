@@ -5,7 +5,7 @@ namespace DataAccess.Extensions;
 
 public static class IMapperSessionExtensions
 {
-	public static T GetByIdOrThrowAsync<T>(this IMapperSession<T> mapperSession, Guid id, ILogger logger)
+	public static T GetByIdOrThrow<T>(this IMapperSession<T> mapperSession, Guid id, ILogger logger)
 	{
 		var entity = mapperSession.GetById(id).FirstOrDefault();
 

@@ -4,6 +4,7 @@
     <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -12,14 +13,13 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="AspNetCore.HealthChecks.Oracle" Version="6.0.3" />
-    <PackageReference Include="AspNetCore.HealthChecks.UI.Client" Version="6.0.5" />
-    <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.1" />
-    <PackageReference Include="FluentValidation.AspNetCore" Version="11.3.0" />
-    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="7.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Log4Net.AspNetCore" Version="6.1.0" />
-    <PackageReference Include="Oracle.ManagedDataAccess.Core" Version="3.21.100" />
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
+    <PackageReference Include="AspNetCore.HealthChecks.Oracle" Version="[6.0.3]" />
+    <PackageReference Include="AspNetCore.HealthChecks.UI.Client" Version="[6.0.5]" />
+    <PackageReference Include="FluentValidation.AspNetCore" Version="[11.3.0]" />
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="[7.0.0]" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Log4Net.AspNetCore" Version="[6.1.0]" />
+    <PackageReference Include="Oracle.ManagedDataAccess.Core" Version="[3.21.100]" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="[6.4.0]" />
   </ItemGroup>
 
   <ItemGroup>

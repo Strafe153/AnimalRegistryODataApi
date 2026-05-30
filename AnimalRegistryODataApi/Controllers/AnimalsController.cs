@@ -1,4 +1,4 @@
-﻿using Application.DTOs;
+﻿using Application.DTOs.Animal;
 using Application.Services.Interfaces;
 using Domain.Constants;
 using Microsoft.AspNetCore.Mvc;
@@ -31,8 +31,8 @@ public class AnimalsController : ODataController
 	[ResponseCache(CacheProfileName = CacheConstants.Default)]
 	[Consumes(MediaTypeNames.Application.Json)]
 	[Produces(MediaTypeNames.Application.Json)]
-	[ProducesResponseType(typeof(IQueryable<AnimalDto>), StatusCodes.Status200OK)]
-	public ActionResult<IQueryable<AnimalDto>> Get() => Ok(_animalsService.GetAll());
+	[ProducesResponseType(typeof(IQueryable<AnimalReadDto>), StatusCodes.Status200OK)]
+	public ActionResult<IQueryable<AnimalReadDto>> Get() => Ok(_animalsService.GetAll());
 
 	/// <summary>
 	/// Fetches an animal by the specified key
@@ -44,8 +44,8 @@ public class AnimalsController : ODataController
 	[ResponseCache(CacheProfileName = CacheConstants.Default)]
 	[Consumes(MediaTypeNames.Application.Json)]
 	[Produces(MediaTypeNames.Application.Json)]
-	[ProducesResponseType(typeof(SingleResult<AnimalDto>), StatusCodes.Status200OK)]
-	public ActionResult<SingleResult<AnimalDto>> Get([FromODataUri] Guid key) =>
+	[ProducesResponseType(typeof(SingleResult<AnimalReadDto>), StatusCodes.Status200OK)]
+	public ActionResult<SingleResult<AnimalReadDto>> Get([FromODataUri] Guid key) =>
 		Ok(SingleResult.Create(_animalsService.GetById(key)));
 
 	/// <summary>
@@ -69,9 +69,9 @@ public class AnimalsController : ODataController
 	/// <response code="400">Returns if the validations are not passed or the operation fails</response>
 	[Consumes(MediaTypeNames.Application.Json)]
 	[Produces(MediaTypeNames.Application.Json)]
-	[ProducesResponseType(typeof(AnimalDto), StatusCodes.Status201Created)]
+	[ProducesResponseType(typeof(AnimalReadDto), StatusCodes.Status201Created)]
 	[ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-	public async Task<ActionResult<AnimalDto>> Post([FromBody] AnimalDto createDto)
+	public async Task<ActionResult<AnimalReadDto>> Post([FromBody] AnimalCreateDto createDto)
 	{
 		var readDto = await _animalsService.CreateAsync(createDto);
 		return CreatedAtAction(nameof(Get), new { Key = readDto.Id }, readDto);
@@ -100,10 +100,10 @@ public class AnimalsController : ODataController
 	/// <response code="404">Returns if an animal does not exist</response>
 	[Consumes(MediaTypeNames.Application.Json)]
 	[Produces(MediaTypeNames.Application.Json)]
-	[ProducesResponseType(typeof(AnimalDto), StatusCodes.Status204NoContent)]
+	[ProducesResponseType(typeof(AnimalReadDto), StatusCodes.Status204NoContent)]
 	[ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
 	[ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-	public async Task<ActionResult> Put([FromODataUri] Guid key, [FromBody] AnimalDto updateDto)
+	public async Task<ActionResult> Put([FromODataUri] Guid key, [FromBody] AnimalUpdateDto updateDto)
 	{
 		await _animalsService.UpdateAsync(key, updateDto);
 		return NoContent();
@@ -130,10 +130,10 @@ public class AnimalsController : ODataController
 	/// <response code="404">Returns if an animal does not exist</response>
 	[Consumes(MediaTypeNames.Application.Json)]
 	[Produces(MediaTypeNames.Application.Json)]
-	[ProducesResponseType(typeof(AnimalDto), StatusCodes.Status204NoContent)]
+	[ProducesResponseType(typeof(AnimalReadDto), StatusCodes.Status204NoContent)]
 	[ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
 	[ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-	public async Task<ActionResult> Patch([FromODataUri] Guid key, [FromBody] Delta<AnimalDto> delta)
+	public async Task<ActionResult> Patch([FromODataUri] Guid key, [FromBody] Delta<AnimalUpdateDto> delta)
 	{
 		await _animalsService.UpdateAsync(key, delta);
 		return NoContent();
@@ -149,7 +149,7 @@ public class AnimalsController : ODataController
 	/// <response code="404">Returns if an animal does not exist</response>
 	[Consumes(MediaTypeNames.Application.Json)]
 	[Produces(MediaTypeNames.Application.Json)]
-	[ProducesResponseType(typeof(AnimalDto), StatusCodes.Status204NoContent)]
+	[ProducesResponseType(typeof(AnimalReadDto), StatusCodes.Status204NoContent)]
 	[ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
 	[ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
 	public async Task<ActionResult> Delete([FromODataUri] Guid key)

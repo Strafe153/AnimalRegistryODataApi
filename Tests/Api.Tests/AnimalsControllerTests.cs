@@ -1,7 +1,9 @@
 ﻿using Api.Tests.Fixtures;
-using Application.DTOs;
+using Application.DTOs.Animal;
+using Application.DTOs.Owner;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.OData.Deltas;
 using Microsoft.AspNetCore.OData.Results;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
@@ -22,39 +24,93 @@ public class AnimalsControllerTests
 	[TestMethod]
 	public void Get_Should_ReturnIQueryableOfAnimalDto()
 	{
-		// Arrange
+		var owner = new OwnerReadDto
+		{
+			Id = Guid.NewGuid(),
+			FirstName = "Ren",
+			LastName = "Amamiya",
+			Age = 16,
+			Email = "joker@mail.com",
+			PhoneNumber = "0983471892",
+			Animals = []
+		};
+
+		var animalsQuery = new List<AnimalReadDto>
+		{
+			new()
+			{
+				Id = Guid.NewGuid(),
+				PetName = "Morgana",
+				Kind = "Not a cat",
+				Age = 1,
+				Owner = owner
+			},
+			new()
+			{
+				Id = Guid.NewGuid(),
+				PetName = "Sissel",
+				Kind = "Cat",
+				Age = 4,
+				Owner = owner
+			}
+		}.AsQueryable();
+
 		_fixture.AnimalsService
 			.Setup(s => s.GetAll())
-			.Returns(_fixture.AnimalDtoQuery);
+			.Returns(animalsQuery);
 
 		// Act
-		var result = _fixture.AnimalsController.Get();
+		var sut = _fixture.CreateSut();
+		var result = sut.Get();
 		var objectResult = result.Result as OkObjectResult;
-		var queryResult = objectResult?.Value as IQueryable<AnimalDto>;
+		var queryResult = objectResult?.Value as IQueryable<AnimalReadDto>;
 
 		// Assert
-		Assert.IsInstanceOfType<ActionResult<IQueryable<AnimalDto>>>(result);
+		Assert.IsInstanceOfType<ActionResult<IQueryable<AnimalReadDto>>>(result);
 		Assert.AreEqual(StatusCodes.Status200OK, objectResult?.StatusCode);
 		Assert.IsNotNull(queryResult);
-		Assert.AreEqual(_fixture.AnimalDtosCount, queryResult.Count());
+		Assert.AreEqual(2, queryResult.Count());
 	}
 
 	[TestMethod]
 	public void Get_Should_ReturnSingleResultOfAnimalDto_WhenAnimalExists()
 	{
 		// Arrange
+		var animalId = Guid.NewGuid();
+
+		var animalQuery = new AnimalReadDto[]
+		{
+			new()
+			{
+				PetName = "Morgana",
+				Kind = "Not a cat",
+				Age = 1,
+				Owner = new OwnerReadDto
+				{
+					Id = Guid.NewGuid(),
+					FirstName = "Ren",
+					LastName = "Amamiya",
+					Age = 16,
+					Email = "joker@mail.com",
+					PhoneNumber = "0983471892",
+					Animals = []
+				}
+			}
+		}.AsQueryable();
+
 		_fixture.AnimalsService
-			.Setup(s => s.GetById(It.IsAny<Guid>()))
-			.Returns(_fixture.AnimalDtoQuery);
+			.Setup(s => s.GetById(animalId))
+			.Returns(animalQuery);
 
 		// Act
-		var result = _fixture.AnimalsController.Get(_fixture.Id);
+		var sut = _fixture.CreateSut();
+		var result = sut.Get(animalId);
 		var objectResult = result.Result as OkObjectResult;
-		var singleResult = objectResult?.Value as SingleResult<AnimalDto>;
+		var singleResult = objectResult?.Value as SingleResult<AnimalReadDto>;
 
 		// Assert
 		Assert.IsNotNull(result);
-		Assert.IsInstanceOfType<ActionResult<SingleResult<AnimalDto>>>(result);
+		Assert.IsInstanceOfType<ActionResult<SingleResult<AnimalReadDto>>>(result);
 		Assert.AreEqual(StatusCodes.Status200OK, objectResult?.StatusCode);
 		Assert.IsNotNull(singleResult);
 	}
@@ -63,27 +119,66 @@ public class AnimalsControllerTests
 	public async Task Post_Should_ReturnActionResultOfAnimalDto_WhenAnimalDtoIsValid()
 	{
 		// Arrange
+		var ownerId = Guid.NewGuid();
+
+		var createDto = new AnimalCreateDto
+		{
+			PetName = "Morgana",
+			Kind = "Not a cat",
+			Age = 1,
+			OwnerId = ownerId
+		};
+
+		var readDto = new AnimalReadDto
+		{
+			Id = Guid.NewGuid(),
+			PetName = "Morgana",
+			Kind = "Not a cat",
+			Age = 1,
+			Owner = new OwnerReadDto
+			{
+				Id = ownerId,
+				FirstName = "Ren",
+				LastName = "Amamiya",
+				Age = 16,
+				Email = "joker@mail.com",
+				PhoneNumber = "0983471892",
+				Animals = []
+			}
+		};
+
 		_fixture.AnimalsService
-			.Setup(s => s.CreateAsync(It.IsAny<AnimalDto>()))
-			.ReturnsAsync(_fixture.AnimalDto);
+			.Setup(s => s.CreateAsync(createDto))
+			.ReturnsAsync(readDto);
 
 		// Act
-		var result = await _fixture.AnimalsController.Post(_fixture.AnimalDto);
+		var sut = _fixture.CreateSut();
+		var result = await sut.Post(createDto);
 		var objectResult = result.Result as CreatedAtActionResult;
-		var animalDto = objectResult?.Value as AnimalDto;
+		var animalDto = objectResult?.Value as AnimalReadDto;
 
 		// Assert
 		Assert.IsNotNull(result);
-		Assert.IsInstanceOfType<ActionResult<AnimalDto>>(result);
+		Assert.IsInstanceOfType<ActionResult<AnimalReadDto>>(result);
 		Assert.AreEqual(StatusCodes.Status201Created, objectResult?.StatusCode);
-		Assert.IsNotNull(animalDto);
+		Assert.IsNotNull(createDto);
 	}
 
 	[TestMethod]
 	public async Task Put_Should_ReturnNoContentResult_WhenAnimalExists()
 	{
+		// Arrange
+		var updateDto = new AnimalUpdateDto
+		{
+			PetName = "Morgana",
+			Kind = "Not a cat",
+			Age = 1,
+			OwnerId = Guid.NewGuid()
+		};
+
 		// Act
-		var result = await _fixture.AnimalsController.Put(_fixture.Id, _fixture.AnimalDto);
+		var sut = _fixture.CreateSut();
+		var result = await sut.Put(Guid.NewGuid(), updateDto);
 		var objectResult = result as NoContentResult;
 
 		// Assert
@@ -95,8 +190,15 @@ public class AnimalsControllerTests
 	[TestMethod]
 	public async Task Patch_Should_ReturnNoContentResult_WhenAnimalExists()
 	{
+		// Arrange
+		var delta = new Delta<AnimalUpdateDto>();
+
+		delta.TrySetPropertyValue(nameof(AnimalUpdateDto.PetName), "Morgana");
+		delta.TrySetPropertyValue(nameof(AnimalUpdateDto.Age), 2);
+
 		// Act
-		var result = await _fixture.AnimalsController.Patch(_fixture.Id, _fixture.AnimalDtoDelta);
+		var sut = _fixture.CreateSut();
+		var result = await sut.Patch(Guid.NewGuid(), delta);
 		var objectResult = result as NoContentResult;
 
 		// Assert
@@ -109,7 +211,8 @@ public class AnimalsControllerTests
 	public async Task Delete_Should_ReturnNoContentResult_WhenAnimalExists()
 	{
 		// Act
-		var result = await _fixture.AnimalsController.Delete(_fixture.Id);
+		var sut = _fixture.CreateSut();
+		var result = await sut.Delete(Guid.NewGuid());
 		var objectResult = result as NoContentResult;
 
 		// Assert

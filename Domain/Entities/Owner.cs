@@ -9,5 +9,5 @@ public class Owner
 	public virtual string Email { get; set; } = default!;
 	public virtual string PhoneNumber { get; set; } = default!;
 
-	public virtual IList<Animal> Animals { get; set; } = default!;
+	public virtual IList<Animal> Animals { get; set; } = [];
 }
